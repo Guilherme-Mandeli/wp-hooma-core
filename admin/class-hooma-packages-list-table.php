@@ -153,7 +153,7 @@ class Hooma_Packages_List_Table extends WP_List_Table
 
     protected function display_tablenav($which)
     {
-        if ('top' === $which && !$this->has_items()) {
+        if ('top' === $which && (!$this->has_items() || (!$this->has_bulk_actions() && empty($this->_pagination_args)))) {
             return;
         }
         parent::display_tablenav($which);

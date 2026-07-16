@@ -21,7 +21,6 @@ class Hooma_UI
             <?php if ($subtitle): ?>
                 <p class="description"><?php echo esc_html($subtitle); ?></p>
             <?php endif; ?>
-            <hr>
         </div>
         <?php
     }

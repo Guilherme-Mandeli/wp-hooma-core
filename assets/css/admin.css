@@ -1,0 +1,418 @@
+.wp-upload-box {
+    display: block;
+    border: 1px dashed #c3c4c7;
+    border-radius: 4px;
+    background: #f6f7f7;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+
+.wp-upload-box:hover {
+    border-color: #2271b1;
+    background: #f0f6fc;
+}
+
+.wp-upload-box input[type="file"] {
+    display: none;
+}
+
+.wp-upload-content {
+    color: #2c3338;
+    font-size: 14px;
+}
+
+.wp-upload-content strong {
+    display: block;
+    color: #2271b1;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.wp-upload-hint {
+    font-size: 12px;
+    color: #646970;
+}
+
+.wp-upload-box:focus-within {
+    outline: 2px solid #2271b1;
+    outline-offset: 2px;
+}
+
+.hooma-upload-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.wp-list-table .dashicons-yes {
+    color: #4ab866;
+}
+
+.wp-list-table .dashicons-no-alt {
+    color: #6C757D;
+}
+
+/* Package Type Badges */
+.hooma-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.2;
+    border-radius: 12px;
+    text-transform: capitalize;
+}
+.badge-javascript {
+    background-color: #fef9c3;
+    color: #713f12;
+}
+.badge-php {
+    background-color: #eeeafe;
+    color: #4f46e5;
+}
+.badge-binary {
+    background-color: #ffedd5;
+    color: #c2410c;
+}
+.badge-asset {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+.badge-template {
+    background-color: #fce7f3;
+    color: #be185d;
+}
+.badge-schema {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+.wp-list-table tbody tr:hover {
+    background-color: #f8fafc !important;
+    transition: background-color 0.15s ease;
+}
+
+/* Compatibility Badges */
+.hooma-service-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.1;
+    border-radius: 4px;
+    background-color: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    margin-right: 2px;
+    margin-bottom: 2px;
+}
+.hooma-service-badge.badge-assets {
+    background-color: #f0fdf4;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+.hooma-service-badge.badge-http {
+    background-color: #eff6ff;
+    color: #1e40af;
+    border-color: #bfdbfe;
+}
+.hooma-service-badge.badge-build {
+    background-color: #faf5ff;
+    color: #6b21a8;
+    border-color: #e9d5ff;
+}
+.hooma-service-badge.badge-settings {
+    background-color: #f1f5f9;
+    color: #334155;
+    border-color: #cbd5e1;
+}
+.hooma-service-badge.badge-cache {
+    background-color: #fff7ed;
+    color: #9a3412;
+    border-color: #fed7aa;
+}
+
+/* Grid Layout for details sheet */
+.hooma-package-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 20px;
+    margin-top: 20px;
+    align-items: start;
+}
+
+.hooma-package-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.hooma-sidebar-card {
+    background: #ffffff;
+    border: 1px solid #c3c4c7;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.hooma-sidebar-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1d2327;
+    margin: 0;
+}
+
+.hooma-sidebar-subtitle {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    margin: 0 0 10px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.hooma-metadata-table {
+    width: 100%;
+    margin-top: 15px;
+    border-collapse: collapse;
+}
+
+.hooma-metadata-table th {
+    text-align: left;
+    font-size: 13px;
+    color: #646970;
+    padding: 6px 0;
+    font-weight: 500;
+    width: 80px;
+}
+
+.hooma-metadata-table td {
+    font-size: 13px;
+    color: #2c3338;
+    padding: 6px 0;
+}
+
+.hooma-sidebar-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+    border-top: 1px solid #f0f0f1;
+    padding-top: 15px;
+}
+
+
+.hooma-sidebar-service-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.hooma-sidebar-service-item:last-child {
+    border-bottom: none;
+}
+
+.hooma-sidebar-service-item .service-label {
+    font-size: 12px;
+    color: #475569;
+    font-weight: 500;
+}
+
+.hooma-package-content-area {
+    background: #ffffff;
+    border: 1px solid #c3c4c7;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+/* Detail Tabs Navigation */
+.hooma-detail-tabs-nav {
+    display: flex;
+    background: #f6f7f7;
+    border-bottom: 1px solid #c3c4c7;
+}
+
+.hooma-detail-tab-btn {
+    background: none;
+    border: none;
+    border-right: 1px solid #c3c4c7;
+    padding: 15px 25px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.hooma-detail-tab-btn:hover {
+    background: #f0f0f1;
+    color: #1d2327;
+}
+
+.hooma-detail-tab-btn.active {
+    background: #ffffff;
+    color: #2271b1;
+    border-bottom: 2px solid #2271b1;
+    margin-bottom: -1px;
+}
+
+/* Tab Panes */
+.hooma-detail-tab-pane {
+    display: none;
+    padding: 30px;
+}
+
+.hooma-detail-tab-pane.active {
+    display: block;
+}
+
+/* Markdown Viewer */
+.hooma-markdown-body {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #2c3338;
+}
+
+.hooma-markdown-body h1, 
+.hooma-markdown-body h2, 
+.hooma-markdown-body h3 {
+    color: #1d2327;
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.hooma-markdown-body h1 { font-size: 24px; border-bottom: 1px solid #d0d7de; padding-bottom: 8px; }
+.hooma-markdown-body h2 { font-size: 20px; border-bottom: 1px solid #d0d7de; padding-bottom: 6px; }
+.hooma-markdown-body h3 { font-size: 16px; }
+
+.hooma-markdown-body p, 
+.hooma-markdown-body ul, 
+.hooma-markdown-body ol {
+    margin-bottom: 16px;
+}
+
+.hooma-markdown-body ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+.hooma-markdown-body code {
+    background-color: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 12px;
+    color: #0f172a;
+}
+
+.hooma-markdown-body pre {
+    background-color: #f8fafc;
+    padding: 16px;
+    border-radius: 6px;
+    overflow: auto;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 16px;
+}
+
+.hooma-markdown-body pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+}
+
+/* Examples Explorer */
+.hooma-examples-explorer {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    min-height: 400px;
+    overflow: hidden;
+}
+
+.hooma-examples-list-panel {
+    background-color: #f8fafc;
+    border-right: 1px solid #e2e8f0;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.hooma-example-group {
+    margin-bottom: 20px;
+}
+
+.hooma-example-group-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hooma-example-files-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.hooma-example-file-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #64748b;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.hooma-example-file-link:hover {
+    background-color: #f1f5f9;
+    color: #1e293b;
+}
+
+.hooma-example-file-link.active {
+    background-color: #e2e8f0;
+    color: #0f172a;
+    font-weight: 500;
+}
+
+.hooma-code-viewer-panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.hooma-code-viewer-header {
+    background-color: #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 10px 15px;
+    font-size: 12px;
+    color: #334155;
+}
+
+.hooma-code-pre {
+    margin: 0;
+    padding: 20px;
+    background-color: #1e293b;
+    color: #f8fafc;
+    overflow: auto;
+    flex-grow: 1;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.hooma-code-pre code {
+    font-family: inherit;
+}

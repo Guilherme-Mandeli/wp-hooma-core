@@ -8,8 +8,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 
 // Version definition (dynamically read from hooma.php header)
-$hooma_version = '1.0.260716'; // Fallback
+$hooma_version = '1.1.260716'; // Fallback
+
 $plugin_file = plugin_dir_path( dirname( __FILE__ ) ) . 'hooma.php';
+
 if ( function_exists( 'get_file_data' ) ) {
 	$plugin_data = get_file_data( $plugin_file, array( 'Version' => 'Version' ) );
 	if ( ! empty( $plugin_data['Version'] ) ) {
