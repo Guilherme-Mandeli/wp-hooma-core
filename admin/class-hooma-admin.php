@@ -375,10 +375,11 @@ class Hooma_Admin
 
         settings_errors('hooma_messages');
 
-        // Navigation Tabs (Modulos | Paquetes)
+        // Navigation Tabs (Modulos | Paquetes | Documentación)
         $admin_tabs = array(
             'modules'  => __('Modules', 'hooma'),
             'packages' => __('Packages', 'hooma'),
+            'docs'     => __('Documentation', 'hooma'),
         );
 
         $original_uri = $_SERVER['REQUEST_URI'];
@@ -411,6 +412,8 @@ class Hooma_Admin
             $list_table->search_box(__('Search Packages', 'hooma'), 'hooma-search-packages');
             $list_table->display();
             echo '</form>';
+        } elseif ($current_tab === 'docs') {
+            $this->render_global_docs_page();
         } else {
             $list_table = new Hooma_Modules_List_Table();
             $list_table->prepare_items();
@@ -431,6 +434,153 @@ class Hooma_Admin
 
         Hooma_UI::footer();
         Hooma_UI::container_end();
+    }
+
+    /**
+     * Render global documentation page.
+     */
+    public function render_global_docs_page()
+    {
+        $docs_dir = HOOMA_PATH . 'docs';
+        $docs_data = array();
+        
+        if (is_dir($docs_dir)) {
+            // First, scan the root docs folder for any root .md files
+            $root_items = scandir($docs_dir);
+            if ($root_items !== false) {
+                $root_files = array();
+                foreach ($root_items as $item) {
+                    if ($item === '.' || $item === '..') {
+                        continue;
+                    }
+                    $item_path = $docs_dir . '/' . $item;
+                    if (is_file($item_path) && strtolower(pathinfo($item, PATHINFO_EXTENSION)) === 'md') {
+                        $content = file_get_contents($item_path);
+                        if ($content !== false) {
+                            $root_files[$item] = $content;
+                        }
+                    }
+                }
+                if (!empty($root_files)) {
+                    $docs_data['General'] = $root_files;
+                }
+            }
+
+            // Next, scan subdirectories
+            $sub_items = scandir($docs_dir);
+            if ($sub_items !== false) {
+                foreach ($sub_items as $sub_item) {
+                    if ($sub_item === '.' || $sub_item === '..') {
+                        continue;
+                    }
+                    $sub_path = $docs_dir . '/' . $sub_item;
+                    if (is_dir($sub_path)) {
+                        $sub_files_items = scandir($sub_path);
+                        if ($sub_files_items !== false) {
+                            $sub_files = array();
+                            foreach ($sub_files_items as $file_item) {
+                                if ($file_item === '.' || $file_item === '..') {
+                                    continue;
+                                }
+                                $file_path = $sub_path . '/' . $file_item;
+                                if (is_file($file_path) && strtolower(pathinfo($file_item, PATHINFO_EXTENSION)) === 'md') {
+                                    $content = file_get_contents($file_path);
+                                    if ($content !== false) {
+                                        $sub_files[$file_item] = $content;
+                                    }
+                                }
+                            }
+                            if (!empty($sub_files)) {
+                                $docs_data[$sub_item] = $sub_files;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!empty($docs_data)) {
+            ?>
+            <div class="hooma-examples-explorer" style="margin-top: 20px;">
+                <!-- Left: List of documentation groups & files -->
+                <div class="hooma-examples-list-panel">
+                    <?php foreach ($docs_data as $group => $files): ?>
+                        <div class="hooma-example-group">
+                            <h4 class="hooma-example-group-title" onclick="hoomaToggleDocGroup(this)">
+                                <span class="dashicons dashicons-arrow-right"></span> <?php echo esc_html(ucfirst($group)); ?>
+                            </h4>
+                            <ul class="hooma-example-files-list">
+                                <?php foreach ($files as $filename => $content): ?>
+                                    <li>
+                                        <a href="#" class="hooma-doc-file-link" onclick="hoomaSelectGlobalDocFile(event, '<?php echo esc_js($group); ?>', '<?php echo esc_js($filename); ?>')">
+                                            <span class="dashicons dashicons-media-text"></span> <?php echo esc_html($filename); ?>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- Right: Markdown Viewer -->
+                <div class="hooma-code-viewer-panel" style="background:#ffffff;">
+                    <div class="hooma-code-viewer-header" id="hooma-global-doc-viewer-header">
+                        <span class="description"><?php _e('Select a document to view its content', 'hooma'); ?></span>
+                    </div>
+                    <!-- CDN Marked markdown library -->
+                    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+                    <div class="hooma-markdown-body" id="hooma-global-doc-body" style="padding: 30px; overflow-y: auto; flex-grow: 1; max-height: 600px; box-sizing: border-box;">
+                        <span class="description"><?php _e('No document selected.', 'hooma'); ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                var hoomaGlobalDocs = <?php echo json_encode($docs_data); ?>;
+                
+                function hoomaSelectGlobalDocFile(e, group, filename) {
+                    e.preventDefault();
+                    
+                    // Deactivate current active links
+                    document.querySelectorAll('.hooma-doc-file-link').forEach(function(el) {
+                        el.classList.remove('active');
+                    });
+                    e.currentTarget.classList.add('active');
+
+                    var content = hoomaGlobalDocs[group] ? hoomaGlobalDocs[group][filename] : '';
+                    
+                    document.getElementById('hooma-global-doc-viewer-header').innerHTML = '<strong>' + group + ' / ' + filename + '</strong>';
+                    var docBody = document.getElementById('hooma-global-doc-body');
+                    if (window.marked && content) {
+                        docBody.innerHTML = marked.parse(content);
+                    } else {
+                        docBody.textContent = content;
+                    }
+                }
+
+                function hoomaToggleDocGroup(header) {
+                    var group = header.closest('.hooma-example-group');
+                    var list = group.querySelector('.hooma-example-files-list');
+                    var icon = header.querySelector('.dashicons');
+                    if (list.style.display === 'none' || !list.style.display) {
+                        list.style.display = 'block';
+                        icon.classList.remove('dashicons-arrow-right');
+                        icon.classList.add('dashicons-arrow-down');
+                    } else {
+                        list.style.display = 'none';
+                        icon.classList.remove('dashicons-arrow-down');
+                        icon.classList.add('dashicons-arrow-right');
+                    }
+                }
+            </script>
+            <?php
+        } else {
+            ?>
+            <div class="notice notice-info inline" style="margin-top: 20px;">
+                <p><?php _e('No documentation files found in /docs.', 'hooma'); ?></p>
+            </div>
+            <?php
+        }
     }
 
 
@@ -584,6 +734,13 @@ class Hooma_Admin
             }
         }
 
+        $docs = $package->get_docs();
+        $docs_data = array();
+        foreach ($docs as $doc) {
+            $content = $package->get_doc_content($doc);
+            $docs_data[$doc] = $content;
+        }
+
         // Back Button
         $back_url = remove_query_arg('package_details');
         ?>
@@ -660,6 +817,7 @@ class Hooma_Admin
                 <div class="hooma-detail-tabs-nav">
                     <button class="hooma-detail-tab-btn active" onclick="hoomaSwitchDetailTab(event, 'overview')"><?php _e('Overview', 'hooma'); ?></button>
                     <button class="hooma-detail-tab-btn" onclick="hoomaSwitchDetailTab(event, 'examples')"><?php _e('Examples & Snippets', 'hooma'); ?></button>
+                    <button class="hooma-detail-tab-btn" onclick="hoomaSwitchDetailTab(event, 'docs')"><?php _e('Documentation', 'hooma'); ?></button>
                 </div>
 
                 <!-- Tab Content: Overview -->
@@ -693,8 +851,8 @@ class Hooma_Admin
                             <div class="hooma-examples-list-panel">
                                 <?php foreach ($examples as $example): ?>
                                     <div class="hooma-example-group">
-                                        <h4 class="hooma-example-group-title">
-                                            <span class="dashicons dashicons-portfolio"></span> <?php echo esc_html(ucfirst($example)); ?>
+                                        <h4 class="hooma-example-group-title" onclick="hoomaToggleDocGroup(this)">
+                                            <span class="dashicons dashicons-arrow-right"></span> <?php echo esc_html(ucfirst($example)); ?>
                                         </h4>
                                         <ul class="hooma-example-files-list">
                                             <?php foreach ($examples_data[$example] as $filename => $content): ?>
@@ -743,6 +901,69 @@ class Hooma_Admin
                         </div>
                     <?php endif; ?>
                 </div>
+
+                <!-- Tab Content: Docs -->
+                <div id="hooma-tab-docs" class="hooma-detail-tab-pane">
+                    <?php if (!empty($docs_data)): ?>
+                        <div class="hooma-examples-explorer">
+                            <!-- Left: List of documentation files -->
+                            <div class="hooma-examples-list-panel">
+                                <div class="hooma-example-group">
+                                    <h4 class="hooma-example-group-title" onclick="hoomaToggleDocGroup(this)">
+                                        <span class="dashicons dashicons-arrow-right"></span> <?php _e('Documents', 'hooma'); ?>
+                                    </h4>
+                                    <ul class="hooma-example-files-list">
+                                        <?php foreach ($docs_data as $filename => $content): ?>
+                                            <li>
+                                                <a href="#" class="hooma-doc-file-link" onclick="hoomaSelectDocFile(event, '<?php echo esc_js($filename); ?>')">
+                                                    <span class="dashicons dashicons-media-text"></span> <?php echo esc_html($filename); ?>
+                                                </a>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Right: Markdown Viewer -->
+                            <div class="hooma-code-viewer-panel" style="background:#ffffff;">
+                                <div class="hooma-code-viewer-header" id="hooma-doc-viewer-header">
+                                    <span class="description"><?php _e('Select a document to view its content', 'hooma'); ?></span>
+                                </div>
+                                <div class="hooma-markdown-body" id="hooma-doc-body" style="padding: 30px; overflow-y: auto; flex-grow: 1; max-height: 600px; box-sizing: border-box;">
+                                    <span class="description"><?php _e('No document selected.', 'hooma'); ?></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <script>
+                            var hoomaPackageDocs = <?php echo json_encode($docs_data); ?>;
+                            
+                            function hoomaSelectDocFile(e, filename) {
+                                e.preventDefault();
+                                
+                                // Deactivate current active links
+                                document.querySelectorAll('.hooma-doc-file-link').forEach(function(el) {
+                                    el.classList.remove('active');
+                                });
+                                e.currentTarget.classList.add('active');
+
+                                var content = hoomaPackageDocs[filename] || '';
+                                
+                                document.getElementById('hooma-doc-viewer-header').innerHTML = '<strong>' + filename + '</strong>';
+                                var docBody = document.getElementById('hooma-doc-body');
+                                if (window.marked && content) {
+                                    docBody.innerHTML = marked.parse(content);
+                                } else {
+                                    docBody.textContent = content;
+                                }
+                            }
+                        </script>
+                    <?php else: ?>
+                        <div class="notice notice-info inline">
+                            <p><?php _e('No documentation files provided for this package.', 'hooma'); ?></p>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
 
@@ -760,6 +981,21 @@ class Hooma_Admin
                     pane.classList.remove('active');
                 });
                 document.getElementById('hooma-tab-' + tabId).classList.add('active');
+            }
+
+            function hoomaToggleDocGroup(header) {
+                var group = header.closest('.hooma-example-group');
+                var list = group.querySelector('.hooma-example-files-list');
+                var icon = header.querySelector('.dashicons');
+                if (list.style.display === 'none' || !list.style.display) {
+                    list.style.display = 'block';
+                    icon.classList.remove('dashicons-arrow-right');
+                    icon.classList.add('dashicons-arrow-down');
+                } else {
+                    list.style.display = 'none';
+                    icon.classList.remove('dashicons-arrow-down');
+                    icon.classList.add('dashicons-arrow-right');
+                }
             }
         </script>
         <?php

@@ -356,15 +356,24 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s ease;
+}
+
+.hooma-example-group-title:hover {
+    color: #1e293b;
 }
 
 .hooma-example-files-list {
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin: 0 0 10px 10px;
+    display: none;
 }
 
-.hooma-example-file-link {
+.hooma-example-file-link,
+.hooma-doc-file-link {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -376,12 +385,14 @@
     transition: all 0.15s ease;
 }
 
-.hooma-example-file-link:hover {
+.hooma-example-file-link:hover,
+.hooma-doc-file-link:hover {
     background-color: #f1f5f9;
     color: #1e293b;
 }
 
-.hooma-example-file-link.active {
+.hooma-example-file-link.active,
+.hooma-doc-file-link.active {
     background-color: #e2e8f0;
     color: #0f172a;
     font-weight: 500;
