@@ -1,0 +1,298 @@
+# Copyright (C) 2026 Hooma
+# This file is distributed under the same license as the Hooma Core plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Hooma Core 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/Hooma\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Spanish (Spain) <es_ES@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-01-23T11:18:42+00:00\n"
+"PO-Revision-Date: 2026-01-23T12:20:00+00:00\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: hooma\n"
+"Language: es_ES\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Plugin Name of the plugin
+#: hooma.php
+msgid "Hooma Core"
+msgstr "Hooma Core"
+
+#. Description of the plugin
+#: hooma.php
+msgid "Container de serviços para módulos de negócios personalizados da Hooma."
+msgstr "Contenedor de servicios para módulos de negocio personalizados de Hooma."
+
+#. Author of the plugin
+#: hooma.php
+msgid "Hooma"
+msgstr "Hooma"
+
+#: admin/class-hooma-admin.php:36
+#: admin/class-hooma-admin.php:37
+msgid "Modules"
+msgstr "Módulos"
+
+#: admin/class-hooma-admin.php:61
+msgid "Module installed successfully."
+msgstr "Módulo instalado correctamente."
+
+#: admin/class-hooma-admin.php:64
+msgid "Module updated successfully."
+msgstr "Módulo actualizado correctamente."
+
+#: admin/class-hooma-admin.php:67
+msgid "Module deleted successfully."
+msgstr "Módulo eliminado correctamente."
+
+#: admin/class-hooma-admin.php:70
+msgid "Module activated successfully."
+msgstr "Módulo activado correctamente."
+
+#: admin/class-hooma-admin.php:73
+msgid "Module deactivated successfully."
+msgstr "Módulo desactivado correctamente."
+
+#: admin/class-hooma-admin.php:83
+msgid "You do not have permission to do this."
+msgstr "No tienes permiso para hacer esto."
+
+#: admin/class-hooma-admin.php:115
+msgid "The confirmation session has expired. Please try again."
+msgstr "La sesión de confirmación ha caducado. Por favor, inténtalo de nuevo."
+
+#: admin/class-hooma-admin.php:124
+msgid "Installation cancelled."
+msgstr "Instalación cancelada."
+
+#: admin/class-hooma-admin.php:147
+#: admin/class-hooma-admin.php:178
+msgid "Invalid action."
+msgstr "Acción no válida."
+
+#: admin/class-hooma-admin.php:189
+msgid "Cannot delete an active module. Deactivate it first."
+msgstr "No se puede eliminar un módulo activo. Desactívalo primero."
+
+#: admin/class-hooma-admin.php:202
+msgid "Error deleting module: "
+msgstr "Error al eliminar el módulo: "
+
+#: admin/class-hooma-admin.php:234
+msgid "Installation Conflict"
+msgstr "Conflicto de instalación"
+
+#: admin/class-hooma-admin.php:239
+#: includes/class-hooma-installer.php:78
+#, php-format
+msgid "The module directory \"%s\" already exists."
+msgstr "El directorio del módulo \"%s\" ya existe."
+
+#: admin/class-hooma-admin.php:241
+msgid "This usually means a version of this module is already installed."
+msgstr "Esto suele significar que ya hay una versión de este módulo instalada."
+
+#: admin/class-hooma-admin.php:242
+msgid "Do you want to replace the existing version with the uploaded version?"
+msgstr "¿Quieres reemplazar la versión existente con la versión subida?"
+
+#: admin/class-hooma-admin.php:246
+msgid "Module:"
+msgstr "Módulo:"
+
+#: admin/class-hooma-admin.php:247
+msgid "Namespace:"
+msgstr "Espacio de nombres:"
+
+#: admin/class-hooma-admin.php:249
+msgid "Package Version:"
+msgstr "Versión del paquete:"
+
+#: admin/class-hooma-admin.php:257
+msgid "Overwrite Existing Version"
+msgstr "Sobrescribir versión existente"
+
+#: admin/class-hooma-admin.php:258
+#: admin/class-hooma-admin.php:349
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: admin/class-hooma-admin.php:272
+msgid "Add Module"
+msgstr "Añadir módulo"
+
+#: admin/class-hooma-admin.php:278
+msgid "Install New Module"
+msgstr "Instalar nuevo módulo"
+
+#: admin/class-hooma-admin.php:343
+msgid "Upload ZIP File"
+msgstr "Subir archivo ZIP"
+
+#: admin/class-hooma-admin.php:344
+msgid "Drag file here or click to select"
+msgstr "Arrastra el archivo aquí o haz clic para seleccionar"
+
+#: admin/class-hooma-admin.php:350
+msgid "Install Now"
+msgstr "Instalar ahora"
+
+#: admin/class-hooma-admin.php:499
+msgid "Content not found."
+msgstr "Contenido no encontrado."
+
+#: admin/class-hooma-admin.php:503
+msgid "Details"
+msgstr "Detalles"
+
+#: admin/class-hooma-admin.php:505
+msgid "The configured view file was not found: "
+msgstr "No se ha encontrado el archivo de vista configurado: "
+
+#: admin/class-hooma-admin.php:507
+msgid "No view defined for this tab."
+msgstr "No hay vista definida para esta pestaña."
+
+#: admin/class-hooma-admin.php:509
+msgid "Make sure to create <code>index.php</code> in the <code>admin/views/</code> folder."
+msgstr "Asegúrate de crear <code>index.php</code> en la carpeta <code>admin/views/</code>."
+
+#: admin/class-hooma-modules-list-table.php:61
+msgid "Module"
+msgstr "Módulo"
+
+#: admin/class-hooma-modules-list-table.php:62
+msgid "Description"
+msgstr "Descripción"
+
+#: admin/class-hooma-modules-list-table.php:63
+msgid "Status"
+msgstr "Estado"
+
+#: admin/class-hooma-modules-list-table.php:92
+msgid "Deactivate"
+msgstr "Desactivar"
+
+#: admin/class-hooma-modules-list-table.php:92
+msgid "Activate"
+msgstr "Activar"
+
+#: admin/class-hooma-modules-list-table.php:97
+msgid "Open"
+msgstr "Abrir"
+
+#: admin/class-hooma-modules-list-table.php:116
+msgid "Are you sure you want to permanently delete this module?"
+msgstr "¿Estás seguro de que quieres eliminar permanentemente este módulo?"
+
+#: admin/class-hooma-modules-list-table.php:117
+msgid "Delete"
+msgstr "Eliminar"
+
+#: admin/class-hooma-modules-list-table.php:134
+msgid "Active"
+msgstr "Activo"
+
+#: admin/class-hooma-modules-list-table.php:136
+msgid "Inactive"
+msgstr "Inactivo"
+
+#: includes/class-hooma-installer.php:20
+msgid "File upload failed."
+msgstr "La subida del archivo ha fallado."
+
+#: includes/class-hooma-installer.php:24
+msgid "Upload error: "
+msgstr "Error de subida: "
+
+#: includes/class-hooma-installer.php:30
+msgid "Only .zip files are allowed."
+msgstr "Solo se permiten archivos .zip."
+
+#: includes/class-hooma-installer.php:139
+msgid "Directory already exists and overwrite was not authorized."
+msgstr "El directorio ya existe y no se autorizó la sobrescritura."
+
+#: includes/class-hooma-installer.php:154
+msgid "Failed to move files to the modules directory."
+msgstr "Fallo al mover los archivos al directorio de módulos."
+
+#: includes/class-hooma-installer.php:173
+msgid "Installation hook error: "
+msgstr "Error en el gancho de instalación: "
+
+#: includes/class-hooma-installer.php:197
+msgid "Module not found."
+msgstr "Módulo no encontrado."
+
+#: includes/class-hooma-installer.php:239
+msgid "Failed to remove module files."
+msgstr "Fallo al eliminar los archivos del módulo."
+
+#: includes/class-hooma-installer.php:251
+msgid "The package is empty."
+msgstr "El paquete está vacío."
+
+#: includes/class-hooma-installer.php:268
+msgid "Invalid structure: The ZIP must contain exactly one root folder."
+msgstr "Estructura no válida: El ZIP debe contener exactamente una carpeta raíz."
+
+#: includes/class-hooma-installer.php:288
+msgid "Module Rejected: Main file missing mandatory security check. Add defined( 'HOOMA_PATH' ) || exit; at the beginning."
+msgstr "Módulo rechazado: Falta la comprobación de seguridad obligatoria en el archivo principal. Añade defined( 'HOOMA_PATH' ) || exit; al principio."
+
+#: includes/class-hooma-installer.php:310
+msgid "Internal Error: Slug could not be determined."
+msgstr "Error interno: No se pudo determinar el slug."
+
+#: includes/class-hooma-installer.php:363
+#, php-format
+msgid "Invalid Structure: Main file not found (%s.php or index.php)."
+msgstr "Estructura no válida: No se encontró el archivo principal (%s.php o index.php)."
+
+#: includes/class-hooma-installer.php:379
+#, php-format
+msgid "Invalid Manifest: Main file (%s) must contain \"Plugin Name\" and \"Version\" headers."
+msgstr "Manifiesto no válido: El archivo principal (%s) debe contener las cabeceras \"Plugin Name\" y \"Version\"."
+
+#: includes/class-hooma-installer.php:401
+#, php-format
+msgid "This module requires Hooma version %s or higher. You are using version %s."
+msgstr "Este módulo requiere la versión %s o superior de Hooma. Estás usando la versión %s."
+
+#: includes/class-hooma-installer.php:455
+#, php-format
+msgid "Required plugin \"%s\" is not installed."
+msgstr "El plugin requerido \"%s\" no está instalado."
+
+#: includes/class-hooma-installer.php:459
+#, php-format
+msgid "Required plugin \"%s\" is installed but not active."
+msgstr "El plugin requerido \"%s\" está instalado pero no activo."
+
+#: includes/class-hooma-installer.php:465
+#, php-format
+msgid "Plugin \"%s\" requires version %s or higher. Installed version: %s."
+msgstr "El plugin \"%s\" requiere la versión %s o superior. Versión instalada: %s."
+
+#: includes/class-hooma-installer.php:511
+#, php-format
+msgid "Required module \"%s\" is not installed."
+msgstr "El módulo requerido \"%s\" no está instalado."
+
+#: includes/class-hooma-installer.php:518
+#, php-format
+msgid "Required module \"%s\" is installed but seems corrupted."
+msgstr "El módulo requerido \"%s\" está instalado pero parece corrupto."
+
+#: includes/class-hooma-installer.php:526
+#, php-format
+msgid "Module \"%s\" requires to be version %s or higher. Installed version: %s."
+msgstr "El módulo \"%s\" requiere ser la versión %s o superior. Versión instalada: %s."
+
+#: admin/class-hooma-admin.php:378
+msgid "Upload module:"
+msgstr "Subir módulo:"
