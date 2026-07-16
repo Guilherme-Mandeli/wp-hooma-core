@@ -6,6 +6,10 @@
  * Author: Technical Writer Hooma
  */
 
+namespace HoomaExamples\CronDemo;
+
+use Hooma;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -14,7 +18,7 @@ if (!defined('ABSPATH')) {
 add_action('hooma_init', function() {
     Hooma::scheduler()->daily(
         'examples.daily_sync',
-        array(\HoomaExamples\CronDemo\SyncDispatcher::class, 'trigger')
+        array(SyncDispatcher::class, 'trigger')
     );
 });
 
@@ -22,10 +26,6 @@ add_action('hooma_init', function() {
 Hooma::events()->listen('examples.sync_triggered', function($payload) {
     Hooma::logger()->info('Ejemplo Cron: Evento de sincronización procesado.', $payload);
 });
-
-namespace HoomaExamples\CronDemo;
-
-use Hooma;
 
 class SyncDispatcher
 {
