@@ -64,7 +64,25 @@ class Hooma_Installer
 		$new_headers = $validation['headers'];
 
 		$dirname = basename($source); // Module folder name
-		$destination = HOOMA_MODULES_PATH . $dirname;
+		
+		$target_modules_dir = WP_CONTENT_DIR . '/hooma/modules/';
+		$can_use_new_path = false;
+		if ($wp_filesystem->exists($target_modules_dir)) {
+			$can_use_new_path = true;
+		} else {
+			$hooma_dir = WP_CONTENT_DIR . '/hooma/';
+			if (!$wp_filesystem->exists($hooma_dir)) {
+				$wp_filesystem->mkdir($hooma_dir);
+			}
+			if ($wp_filesystem->exists($hooma_dir)) {
+				$wp_filesystem->mkdir($target_modules_dir);
+				if ($wp_filesystem->exists($target_modules_dir)) {
+					$can_use_new_path = true;
+				}
+			}
+		}
+
+		$destination = $can_use_new_path ? ($target_modules_dir . $dirname) : (HOOMA_MODULES_PATH . $dirname);
 
 		// 6. Install or Update
 		// Check for existing module
@@ -112,13 +130,26 @@ class Hooma_Installer
 
 		$source = $validation['path'];
 		$dirname = basename($source);
-		$destination = HOOMA_MODULES_PATH . $dirname;
 		$new_headers = $validation['headers'];
 
-		// Create modules dir if not exists
-		if (!$wp_filesystem->exists(HOOMA_MODULES_PATH)) {
-			$wp_filesystem->mkdir(HOOMA_MODULES_PATH);
+		$target_modules_dir = WP_CONTENT_DIR . '/hooma/modules/';
+		$can_use_new_path = false;
+		if ($wp_filesystem->exists($target_modules_dir)) {
+			$can_use_new_path = true;
+		} else {
+			$hooma_dir = WP_CONTENT_DIR . '/hooma/';
+			if (!$wp_filesystem->exists($hooma_dir)) {
+				$wp_filesystem->mkdir($hooma_dir);
+			}
+			if ($wp_filesystem->exists($hooma_dir)) {
+				$wp_filesystem->mkdir($target_modules_dir);
+				if ($wp_filesystem->exists($target_modules_dir)) {
+					$can_use_new_path = true;
+				}
+			}
 		}
+
+		$destination = $can_use_new_path ? ($target_modules_dir . $dirname) : (HOOMA_MODULES_PATH . $dirname);
 
 		// Handle Overwrite
 		$was_active = false;

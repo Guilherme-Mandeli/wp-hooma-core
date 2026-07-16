@@ -57,6 +57,16 @@ class PackageManifest
     protected $entries;
 
     /**
+     * @var string
+     */
+    protected $documentation;
+
+    /**
+     * @var string[]
+     */
+    protected $compatibility;
+
+    /**
      * Constructor del manifiesto.
      *
      * Valida y rellena los datos desde un array asociativo del JSON decodificado.
@@ -128,6 +138,20 @@ class PackageManifest
         
         // Debe tener al menos una entrada si es un package que requiere punto de acceso directo (opcional para templates/assets puros, pero validado)
         $this->entries = $entries;
+
+        // 7. Opcional: Documentation URL
+        $this->documentation = isset($data['documentation']) && is_string($data['documentation']) ? $data['documentation'] : '';
+
+        // 8. Opcional: Compatibility array
+        $compatibility = array();
+        if (isset($data['compatibility']) && is_array($data['compatibility'])) {
+            foreach ($data['compatibility'] as $service) {
+                if (is_string($service)) {
+                    $compatibility[] = sanitize_text_field($service);
+                }
+            }
+        }
+        $this->compatibility = $compatibility;
     }
 
     /**
@@ -200,5 +224,21 @@ class PackageManifest
     public function get_entries(): array
     {
         return $this->entries;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_documentation(): string
+    {
+        return $this->documentation;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function get_compatibility(): array
+    {
+        return $this->compatibility;
     }
 }

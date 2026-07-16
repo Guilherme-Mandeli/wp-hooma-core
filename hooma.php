@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hooma Core
  * Description: Container de serviços para módulos de negócios personalizados da Hooma.
- * Version: 1.0.260715
+ * Version: 1.0.260716
  * Author: Hooma
  * Text Domain: hooma
  * Domain Path: /languages
@@ -71,6 +71,34 @@ add_action('plugins_loaded', 'hooma_init');
 // Register activation hook
 function hooma_activate()
 {
+	require_once plugin_dir_path(__FILE__) . 'config/constants.php';
 
+	require_once ABSPATH . 'wp-admin/includes/file.php';
+	WP_Filesystem();
+	global $wp_filesystem;
+
+	if (defined('FS_CHMOD_DIR')) {
+		$chmod = FS_CHMOD_DIR;
+	} else {
+		$chmod = 0755;
+	}
+
+	// Create parent hooma folder first
+	$hooma_dir = WP_CONTENT_DIR . '/hooma/';
+	if (!$wp_filesystem->exists($hooma_dir)) {
+		$wp_filesystem->mkdir($hooma_dir, $chmod);
+	}
+
+	// Prioritize and create subfolders inside wp-content/hooma/
+	$new_modules_path = $hooma_dir . 'modules/';
+	$packages_path    = $hooma_dir . 'packages/';
+
+	if (!$wp_filesystem->exists($new_modules_path)) {
+		$wp_filesystem->mkdir($new_modules_path, $chmod);
+	}
+
+	if (!$wp_filesystem->exists($packages_path)) {
+		$wp_filesystem->mkdir($packages_path, $chmod);
+	}
 }
 register_activation_hook(__FILE__, 'hooma_activate');

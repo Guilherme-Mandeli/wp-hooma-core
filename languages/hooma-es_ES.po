@@ -296,3 +296,17 @@ msgstr "El módulo \"%s\" requiere ser la versión %s o superior. Versión insta
 #: admin/class-hooma-admin.php:378
 msgid "Upload module:"
 msgstr "Subir módulo:"
+
+#: admin/class-hooma-admin.php:457
+#: admin/class-hooma-packages-list-table.php:57
+msgid "Packages"
+msgstr "Paquetes"
+
+#: admin/class-hooma-packages-list-table.php:58
+msgid "Package"
+msgstr "Paquete"
+
+#: admin/class-hooma-admin.php:470
+msgid "Search Packages"
+msgstr "Buscar paquetes"
+

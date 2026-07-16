@@ -294,3 +294,17 @@ msgstr ""
 #: admin/class-hooma-admin.php:378
 msgid "Upload module:"
 msgstr ""
+
+#: admin/class-hooma-admin.php:457
+#: admin/class-hooma-packages-list-table.php:57
+msgid "Packages"
+msgstr ""
+
+#: admin/class-hooma-packages-list-table.php:58
+msgid "Package"
+msgstr ""
+
+#: admin/class-hooma-admin.php:470
+msgid "Search Packages"
+msgstr ""
+

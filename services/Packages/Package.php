@@ -175,4 +175,110 @@ class Package
         }
         return uniqid('pkg_', true);
     }
+
+    /**
+     * Comprueba si el paquete tiene un archivo README.md.
+     *
+     * @return bool
+     */
+    public function has_readme(): bool
+    {
+        return file_exists($this->path . '/README.md');
+    }
+
+    /**
+     * Obtiene el contenido del README.md del paquete.
+     *
+     * @return string
+     */
+    public function get_readme(): string
+    {
+        if (!$this->has_readme()) {
+            return '';
+        }
+        $content = file_get_contents($this->path . '/README.md');
+        return $content !== false ? $content : '';
+    }
+
+    /**
+     * Obtiene la lista de subcarpetas de ejemplos.
+     *
+     * @return string[]
+     */
+    public function get_examples(): array
+    {
+        $examples_dir = $this->path . '/examples';
+        if (!is_dir($examples_dir)) {
+            return array();
+        }
+        $items = scandir($examples_dir);
+        if ($items === false) {
+            return array();
+        }
+        $examples = array();
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+            if (is_dir($examples_dir . '/' . $item)) {
+                $examples[] = $item;
+            }
+        }
+        return $examples;
+    }
+
+    /**
+     * Obtiene la lista de archivos de un ejemplo específico.
+     *
+     * @param string $example Nombre de la carpeta del ejemplo.
+     * @return string[]
+     */
+    public function get_example_files(string $example): array
+    {
+        $example_dir = $this->path . '/examples/' . sanitize_file_name($example);
+        if (!is_dir($example_dir)) {
+            return array();
+        }
+        $items = scandir($example_dir);
+        if ($items === false) {
+            return array();
+        }
+        $files = array();
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+            if (is_file($example_dir . '/' . $item)) {
+                $files[] = $item;
+            }
+        }
+        return $files;
+    }
+
+    /**
+     * Obtiene el contenido de un archivo de ejemplo específico.
+     *
+     * @param string $example Nombre de la carpeta del ejemplo.
+     * @param string $file Nombre del archivo de ejemplo.
+     * @return string
+     */
+    public function get_example_file_content(string $example, string $file): string
+    {
+        $file_path = $this->path . '/examples/' . sanitize_file_name($example) . '/' . sanitize_file_name($file);
+        if (!is_file($file_path)) {
+            return '';
+        }
+        $content = file_get_contents($file_path);
+        return $content !== false ? $content : '';
+    }
+
+    /**
+     * Obtiene los servicios compatibles declarados.
+     *
+     * @return string[]
+     */
+    public function get_compatibility(): array
+    {
+        return $this->manifest->get_compatibility();
+    }
 }

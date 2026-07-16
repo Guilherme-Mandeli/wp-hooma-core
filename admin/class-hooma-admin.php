@@ -272,161 +272,580 @@ class Hooma_Admin
             }
         }
 
-        // Custom Header with Action Button
+        $current_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'modules';
         ?>
         <div class="hooma-header">
             <h1 class="wp-heading-inline">Hooma Core</h1>
-            <a href="#" id="hooma-add-module-btn" class="page-title-action"><?php _e('Add Module', 'hooma'); ?></a>
+            <?php if ($current_tab === 'modules') : ?>
+                <a href="#" id="hooma-add-module-btn" class="page-title-action"><?php _e('Add Module', 'hooma'); ?></a>
+            <?php endif; ?>
             <hr>
         </div>
 
-        <!-- Upload Form (Hidden by default) -->
-        <div id="hooma-upload-container" class="card" style="display:none; margin-top: 20px; padding: 20px; max-width: 600px;">
-            <h2 style="margin-top: 0;"><?php _e('Install New Module', 'hooma'); ?></h2>
+        <style>
+            .wp-upload-box {
+                display: block;
+                border: 1px dashed #c3c4c7;
+                border-radius: 4px;
+                background: #f6f7f7;
+                padding: 24px;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.15s ease-in-out;
+            }
 
-            <style>
-                .wp-upload-box {
-                    display: block;
-                    border: 1px dashed #c3c4c7;
-                    border-radius: 4px;
-                    background: #f6f7f7;
-                    padding: 24px;
-                    text-align: center;
-                    cursor: pointer;
-                    transition: all 0.15s ease-in-out;
-                }
+            .wp-upload-box:hover {
+                border-color: #2271b1;
+                background: #f0f6fc;
+            }
 
-                .wp-upload-box:hover {
-                    border-color: #2271b1;
-                    background: #f0f6fc;
-                }
+            .wp-upload-box input[type="file"] {
+                display: none;
+            }
 
-                .wp-upload-box input[type="file"] {
-                    display: none;
-                }
+            .wp-upload-content {
+                color: #2c3338;
+                font-size: 14px;
+            }
 
-                .wp-upload-content {
-                    color: #2c3338;
-                    font-size: 14px;
-                }
+            .wp-upload-content strong {
+                display: block;
+                color: #2271b1;
+                font-size: 14px;
+                margin-bottom: 4px;
+            }
 
-                .wp-upload-content strong {
-                    display: block;
-                    color: #2271b1;
-                    font-size: 14px;
-                    margin-bottom: 4px;
-                }
+            .wp-upload-hint {
+                font-size: 12px;
+                color: #646970;
+            }
 
-                .wp-upload-hint {
-                    font-size: 12px;
-                    color: #646970;
-                }
+            .wp-upload-box:focus-within {
+                outline: 2px solid #2271b1;
+                outline-offset: 2px;
+            }
 
-                .wp-upload-box:focus-within {
-                    outline: 2px solid #2271b1;
-                    outline-offset: 2px;
-                }
+            .hooma-upload-actions {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 15px;
+            }
 
-                .hooma-upload-actions {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-top: 15px;
-                }
+            .wp-list-table .dashicons-yes {
+                color: #4ab866;
+            }
 
-                .wp-list-table .dashicons-yes {
-                    color: #4ab866;
-                }
+            .wp-list-table .dashicons-no-alt {
+                color: #6C757D;
+            }
 
-                .wp-list-table .dashicons-no-alt {
-                    color: #6C757D;
-                }
-            </style>
+            /* Package Type Badges */
+            .hooma-badge {
+                display: inline-block;
+                padding: 3px 8px;
+                font-size: 11px;
+                font-weight: 600;
+                line-height: 1.2;
+                border-radius: 12px;
+                text-transform: capitalize;
+            }
+            .badge-javascript {
+                background-color: #fef9c3;
+                color: #713f12;
+            }
+            .badge-php {
+                background-color: #eeeafe;
+                color: #4f46e5;
+            }
+            .badge-binary {
+                background-color: #ffedd5;
+                color: #c2410c;
+            }
+            .badge-asset {
+                background-color: #e0f2fe;
+                color: #0369a1;
+            }
+            .badge-template {
+                background-color: #fce7f3;
+                color: #be185d;
+            }
+            .badge-schema {
+                background-color: #f3f4f6;
+                color: #374151;
+            }
+            .wp-list-table tbody tr:hover {
+                background-color: #f8fafc !important;
+                transition: background-color 0.15s ease;
+            }
 
-            <form method="post" enctype="multipart/form-data" action="">
-                <?php wp_nonce_field('hooma_install_module'); ?>
-                <input type="hidden" name="hooma_action" value="install_module">
+            /* Compatibility Badges */
+            .hooma-service-badge {
+                display: inline-block;
+                padding: 2px 6px;
+                font-size: 10px;
+                font-weight: 500;
+                line-height: 1.1;
+                border-radius: 4px;
+                background-color: #f1f5f9;
+                color: #334155;
+                border: 1px solid #cbd5e1;
+                margin-right: 2px;
+                margin-bottom: 2px;
+            }
+            .hooma-service-badge.badge-assets {
+                background-color: #f0fdf4;
+                color: #166534;
+                border-color: #bbf7d0;
+            }
+            .hooma-service-badge.badge-http {
+                background-color: #eff6ff;
+                color: #1e40af;
+                border-color: #bfdbfe;
+            }
+            .hooma-service-badge.badge-build {
+                background-color: #faf5ff;
+                color: #6b21a8;
+                border-color: #e9d5ff;
+            }
+            .hooma-service-badge.badge-settings {
+                background-color: #f1f5f9;
+                color: #334155;
+                border-color: #cbd5e1;
+            }
+            .hooma-service-badge.badge-cache {
+                background-color: #fff7ed;
+                color: #9a3412;
+                border-color: #fed7aa;
+            }
 
-                <label class="wp-upload-box">
-                    <input type="file" name="module_zip" accept=".zip" required>
-                    <span class="wp-upload-content">
-                        <strong><?php _e('Upload ZIP File', 'hooma'); ?></strong>
-                        <span class="wp-upload-hint"><?php _e('Drag file here or click to select', 'hooma'); ?></span>
-                    </span>
-                </label>
+            /* Grid Layout for details sheet */
+            .hooma-package-grid {
+                display: grid;
+                grid-template-columns: 280px 1fr;
+                gap: 20px;
+                margin-top: 20px;
+                align-items: start;
+            }
 
-                <div class="hooma-upload-actions">
-                    <button type="button" class="button" id="hooma-cancel-upload"><?php _e('Cancel', 'hooma'); ?></button>
-                    <?php submit_button(__('Install Now', 'hooma'), 'primary', 'install', false); ?>
-                </div>
-            </form>
-        </div>
+            .hooma-package-sidebar {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                var btn = document.getElementById('hooma-add-module-btn');
-                var container = document.getElementById('hooma-upload-container');
-                var cancel = document.getElementById('hooma-cancel-upload');
+            .hooma-sidebar-card {
+                background: #ffffff;
+                border: 1px solid #c3c4c7;
+                border-radius: 8px;
+                padding: 20px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            }
 
-                if (btn && container) {
-                    btn.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        container.style.display = container.style.display === 'none' ? 'block' : 'none';
-                    });
-                }
-                if (cancel) {
-                    cancel.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        container.style.display = 'none';
-                    });
-                }
+            .hooma-sidebar-title {
+                font-size: 20px;
+                font-weight: 700;
+                color: #1d2327;
+                margin: 0;
+            }
 
-                // File Upload Dynamic Text
-                var fileInput = document.querySelector('input[name="module_zip"]');
-                if (fileInput) {
-                    fileInput.addEventListener('change', function () {
-                        var wrapper = this.closest('.wp-upload-box');
-                        var title = wrapper.querySelector('strong');
-                        var hint = wrapper.querySelector('.wp-upload-hint');
+            .hooma-sidebar-subtitle {
+                font-size: 11px;
+                font-weight: 600;
+                color: #64748b;
+                margin: 0 0 10px 0;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
 
-                        if (this.files && this.files.length > 0) {
-                            var fileName = this.files[0].name;
-                            if (title) {
-                                title.textContent = '<?php echo esc_js(__('Upload module:', 'hooma')); ?>';
+            .hooma-metadata-table {
+                width: 100%;
+                margin-top: 15px;
+                border-collapse: collapse;
+            }
+
+            .hooma-metadata-table th {
+                text-align: left;
+                font-size: 13px;
+                color: #646970;
+                padding: 6px 0;
+                font-weight: 500;
+                width: 80px;
+            }
+
+            .hooma-metadata-table td {
+                font-size: 13px;
+                color: #2c3338;
+                padding: 6px 0;
+            }
+
+            .hooma-sidebar-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 20px;
+                border-top: 1px solid #f0f0f1;
+                padding-top: 15px;
+            }
+
+            .hooma-sidebar-actions .button-link {
+                text-align: left;
+                padding: 0;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: #2271b1;
+                height: auto;
+            }
+
+            .hooma-sidebar-actions .button-link:hover {
+                color: #135e96;
+            }
+
+            .hooma-sidebar-service-item {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 8px 0;
+                border-bottom: 1px solid #f0f0f1;
+            }
+
+            .hooma-sidebar-service-item:last-child {
+                border-bottom: none;
+            }
+
+            .hooma-sidebar-service-item .service-label {
+                font-size: 12px;
+                color: #475569;
+                font-weight: 500;
+            }
+
+            .hooma-package-content-area {
+                background: #ffffff;
+                border: 1px solid #c3c4c7;
+                border-radius: 8px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+                overflow: hidden;
+            }
+
+            /* Detail Tabs Navigation */
+            .hooma-detail-tabs-nav {
+                display: flex;
+                background: #f6f7f7;
+                border-bottom: 1px solid #c3c4c7;
+            }
+
+            .hooma-detail-tab-btn {
+                background: none;
+                border: none;
+                border-right: 1px solid #c3c4c7;
+                padding: 15px 25px;
+                font-size: 14px;
+                font-weight: 600;
+                color: #475569;
+                cursor: pointer;
+                transition: all 0.15s ease;
+            }
+
+            .hooma-detail-tab-btn:hover {
+                background: #f0f0f1;
+                color: #1d2327;
+            }
+
+            .hooma-detail-tab-btn.active {
+                background: #ffffff;
+                color: #2271b1;
+                border-bottom: 2px solid #2271b1;
+                margin-bottom: -1px;
+            }
+
+            /* Tab Panes */
+            .hooma-detail-tab-pane {
+                display: none;
+                padding: 30px;
+            }
+
+            .hooma-detail-tab-pane.active {
+                display: block;
+            }
+
+            /* Markdown Viewer */
+            .hooma-markdown-body {
+                font-size: 14px;
+                line-height: 1.6;
+                color: #2c3338;
+            }
+
+            .hooma-markdown-body h1, 
+            .hooma-markdown-body h2, 
+            .hooma-markdown-body h3 {
+                color: #1d2327;
+                margin-top: 24px;
+                margin-bottom: 16px;
+                font-weight: 600;
+                line-height: 1.25;
+            }
+
+            .hooma-markdown-body h1 { font-size: 24px; border-bottom: 1px solid #d0d7de; padding-bottom: 8px; }
+            .hooma-markdown-body h2 { font-size: 20px; border-bottom: 1px solid #d0d7de; padding-bottom: 6px; }
+            .hooma-markdown-body h3 { font-size: 16px; }
+
+            .hooma-markdown-body p, 
+            .hooma-markdown-body ul, 
+            .hooma-markdown-body ol {
+                margin-bottom: 16px;
+            }
+
+            .hooma-markdown-body ul {
+                list-style-type: disc;
+                padding-left: 20px;
+            }
+
+            .hooma-markdown-body code {
+                background-color: #f1f5f9;
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-family: monospace;
+                font-size: 12px;
+                color: #0f172a;
+            }
+
+            .hooma-markdown-body pre {
+                background-color: #f8fafc;
+                padding: 16px;
+                border-radius: 6px;
+                overflow: auto;
+                border: 1px solid #e2e8f0;
+                margin-bottom: 16px;
+            }
+
+            .hooma-markdown-body pre code {
+                background: none;
+                padding: 0;
+                color: inherit;
+            }
+
+            /* Examples Explorer */
+            .hooma-examples-explorer {
+                display: grid;
+                grid-template-columns: 240px 1fr;
+                border: 1px solid #e2e8f0;
+                border-radius: 6px;
+                min-height: 400px;
+                overflow: hidden;
+            }
+
+            .hooma-examples-list-panel {
+                background-color: #f8fafc;
+                border-right: 1px solid #e2e8f0;
+                padding: 15px;
+                overflow-y: auto;
+            }
+
+            .hooma-example-group {
+                margin-bottom: 20px;
+            }
+
+            .hooma-example-group-title {
+                font-size: 13px;
+                font-weight: 600;
+                color: #475569;
+                margin: 0 0 8px 0;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .hooma-example-files-list {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .hooma-example-file-link {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 6px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                color: #64748b;
+                text-decoration: none;
+                transition: all 0.15s ease;
+            }
+
+            .hooma-example-file-link:hover {
+                background-color: #f1f5f9;
+                color: #1e293b;
+            }
+
+            .hooma-example-file-link.active {
+                background-color: #e2e8f0;
+                color: #0f172a;
+                font-weight: 500;
+            }
+
+            .hooma-code-viewer-panel {
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            .hooma-code-viewer-header {
+                background-color: #f1f5f9;
+                border-bottom: 1px solid #e2e8f0;
+                padding: 10px 15px;
+                font-size: 12px;
+                color: #334155;
+            }
+
+            .hooma-code-pre {
+                margin: 0;
+                padding: 20px;
+                background-color: #1e293b;
+                color: #f8fafc;
+                overflow: auto;
+                flex-grow: 1;
+                font-family: Consolas, Monaco, monospace;
+                font-size: 13px;
+                line-height: 1.5;
+            }
+
+            .hooma-code-pre code {
+                font-family: inherit;
+            }
+        </style>
+
+        <?php if ($current_tab === 'modules') : ?>
+            <!-- Upload Form (Hidden by default) -->
+            <div id="hooma-upload-container" class="card" style="display:none; margin-top: 20px; padding: 20px; max-width: 600px;">
+                <h2 style="margin-top: 0;"><?php _e('Install New Module', 'hooma'); ?></h2>
+
+                <form method="post" enctype="multipart/form-data" action="">
+                    <?php wp_nonce_field('hooma_install_module'); ?>
+                    <input type="hidden" name="hooma_action" value="install_module">
+
+                    <label class="wp-upload-box">
+                        <input type="file" name="module_zip" accept=".zip" required>
+                        <span class="wp-upload-content">
+                            <strong><?php _e('Upload ZIP File', 'hooma'); ?></strong>
+                            <span class="wp-upload-hint"><?php _e('Drag file here or click to select', 'hooma'); ?></span>
+                        </span>
+                    </label>
+
+                    <div class="hooma-upload-actions">
+                        <button type="button" class="button" id="hooma-cancel-upload"><?php _e('Cancel', 'hooma'); ?></button>
+                        <?php submit_button(__('Install Now', 'hooma'), 'primary', 'install', false); ?>
+                    </div>
+                </form>
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    var btn = document.getElementById('hooma-add-module-btn');
+                    var container = document.getElementById('hooma-upload-container');
+                    var cancel = document.getElementById('hooma-cancel-upload');
+
+                    if (btn && container) {
+                        btn.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            container.style.display = container.style.display === 'none' ? 'block' : 'none';
+                        });
+                    }
+                    if (cancel) {
+                        cancel.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            container.style.display = 'none';
+                        });
+                    }
+
+                    // File Upload Dynamic Text
+                    var fileInput = document.querySelector('input[name="module_zip"]');
+                    if (fileInput) {
+                        fileInput.addEventListener('change', function () {
+                            var wrapper = this.closest('.wp-upload-box');
+                            var title = wrapper.querySelector('strong');
+                            var hint = wrapper.querySelector('.wp-upload-hint');
+
+                            if (this.files && this.files.length > 0) {
+                                var fileName = this.files[0].name;
+                                if (title) {
+                                    title.textContent = '<?php echo esc_js(__('Upload module:', 'hooma')); ?>';
+                                }
+                                if (hint) {
+                                    hint.textContent = fileName;
+                                }
+                            } else {
+                                if (title) {
+                                    title.textContent = '<?php echo esc_js(__('Upload ZIP File', 'hooma')); ?>';
+                                }
+                                if (hint) {
+                                    hint.textContent = '<?php echo esc_js(__('Drag file here or click to select', 'hooma')); ?>';
+                                }
                             }
-                            if (hint) {
-                                hint.textContent = fileName;
-                            }
-                        } else {
-                            if (title) {
-                                title.textContent = '<?php echo esc_js(__('Upload ZIP File', 'hooma')); ?>';
-                            }
-                            if (hint) {
-                                hint.textContent = '<?php echo esc_js(__('Drag file here or click to select', 'hooma')); ?>';
-                            }
-                        }
-                    });
-                }
-            });
-        </script>
+                        });
+                    }
+                });
+            </script>
         <?php
+        endif;
 
         settings_errors('hooma_messages');
 
-        $list_table = new Hooma_Modules_List_Table();
-        $list_table->prepare_items();
+        // Navigation Tabs (Modulos | Paquetes)
+        $admin_tabs = array(
+            'modules'  => __('Modules', 'hooma'),
+            'packages' => __('Packages', 'hooma'),
+        );
 
-        // Outputs All, Active, Inactive links
-        $list_table->views();
+        $original_uri = $_SERVER['REQUEST_URI'];
+        $_SERVER['REQUEST_URI'] = remove_query_arg(array('status', 's', 'paged'), $_SERVER['REQUEST_URI']);
+        Hooma_UI::tabs($admin_tabs, $current_tab);
+        $_SERVER['REQUEST_URI'] = $original_uri;
 
-        echo '<form method="get" style="margin-top:20px;">';
-        echo '<input type="hidden" name="page" value="' . esc_attr($_REQUEST['page']) . '" />';
-        if (isset($_REQUEST['status'])) {
-            echo '<input type="hidden" name="status" value="' . esc_attr($_REQUEST['status']) . '" />';
+        // Check if package details is requested
+        $package_details = isset($_GET['package_details']) ? sanitize_text_field($_GET['package_details']) : '';
+        if ($current_tab === 'packages' && !empty($package_details)) {
+            if (Hooma::packages()->exists($package_details)) {
+                $package = Hooma::packages()->get($package_details);
+                $this->render_package_details_page($package);
+                Hooma_UI::footer();
+                Hooma_UI::container_end();
+                return;
+            } else {
+                echo '<div class="notice notice-error"><p>' . sprintf(__('Package "%s" not found.', 'hooma'), esc_html($package_details)) . '</p></div>';
+            }
         }
-        $list_table->search_box(__('Search Modules', 'hooma'), 'hooma-search-modules');
-        $list_table->display();
-        echo '</form>';
+
+        if ($current_tab === 'packages') {
+            require_once HOOMA_PATH . 'admin/class-hooma-packages-list-table.php';
+            $list_table = new Hooma_Packages_List_Table();
+            $list_table->prepare_items();
+
+            echo '<form method="get" style="margin-top:20px;">';
+            echo '<input type="hidden" name="page" value="' . esc_attr($_REQUEST['page']) . '" />';
+            echo '<input type="hidden" name="tab" value="packages" />';
+            $list_table->search_box(__('Search Packages', 'hooma'), 'hooma-search-packages');
+            $list_table->display();
+            echo '</form>';
+        } else {
+            $list_table = new Hooma_Modules_List_Table();
+            $list_table->prepare_items();
+
+            // Outputs All, Active, Inactive links
+            $list_table->views();
+
+            echo '<form method="get" style="margin-top:20px;">';
+            echo '<input type="hidden" name="page" value="' . esc_attr($_REQUEST['page']) . '" />';
+            echo '<input type="hidden" name="tab" value="modules" />';
+            if (isset($_REQUEST['status'])) {
+                echo '<input type="hidden" name="status" value="' . esc_attr($_REQUEST['status']) . '" />';
+            }
+            $list_table->search_box(__('Search Modules', 'hooma'), 'hooma-search-modules');
+            $list_table->display();
+            echo '</form>';
+        }
 
         Hooma_UI::footer();
         Hooma_UI::container_end();
@@ -559,5 +978,208 @@ class Hooma_Admin
 
         Hooma_UI::footer();
         Hooma_UI::container_end();
+    }
+
+    /**
+     * Render the package details view.
+     *
+     * @param \Hooma\Core\Services\Packages\Package $package
+     */
+    public function render_package_details_page($package)
+    {
+        $manifest = $package->get_manifest();
+        $compatibility = $package->get_compatibility();
+        $readme_content = $package->get_readme();
+
+        $examples = $package->get_examples();
+        $examples_data = array();
+        foreach ($examples as $example) {
+            $files = $package->get_example_files($example);
+            $examples_data[$example] = array();
+            foreach ($files as $file) {
+                $content = $package->get_example_file_content($example, $file);
+                $examples_data[$example][$file] = $content;
+            }
+        }
+
+        // Back Button
+        $back_url = remove_query_arg('package_details');
+        ?>
+        <a href="<?php echo esc_url($back_url); ?>" class="button button-secondary" style="margin-bottom: 20px;">
+            &larr; <?php _e('Back to Packages', 'hooma'); ?>
+        </a>
+
+        <!-- Details Dashboard Grid Layout -->
+        <div class="hooma-package-grid">
+            <!-- Sidebar: Metadata & Compatibility -->
+            <div class="hooma-package-sidebar">
+                <div class="hooma-sidebar-card">
+                    <h2 class="hooma-sidebar-title"><?php echo esc_html($package->get_name()); ?></h2>
+                    <div style="margin-top: 10px; margin-bottom: 15px;">
+                        <span class="hooma-badge badge-<?php echo esc_attr($package->get_type()->value); ?>">
+                            <?php echo esc_html(ucfirst($package->get_type()->value)); ?>
+                        </span>
+                    </div>
+
+                    <table class="hooma-metadata-table">
+                        <tr>
+                            <th><?php _e('Version', 'hooma'); ?>:</th>
+                            <td><code><?php echo esc_html($package->get_version()); ?></code></td>
+                        </tr>
+                        <?php if ($manifest->get_author()): ?>
+                        <tr>
+                            <th><?php _e('Author', 'hooma'); ?>:</th>
+                            <td><?php echo esc_html($manifest->get_author()); ?></td>
+                        </tr>
+                        <?php endif; ?>
+                        <?php if ($manifest->get_license()): ?>
+                        <tr>
+                            <th><?php _e('License', 'hooma'); ?>:</th>
+                            <td><code><?php echo esc_html($manifest->get_license()); ?></code></td>
+                        </tr>
+                        <?php endif; ?>
+                    </table>
+
+                    <div class="hooma-sidebar-actions">
+                        <?php if ($manifest->get_homepage()): ?>
+                            <a href="<?php echo esc_url($manifest->get_homepage()); ?>" target="_blank" rel="noopener noreferrer" class="button button-link">
+                                <span class="dashicons dashicons-admin-links"></span> <?php _e('Homepage', 'hooma'); ?>
+                            </a>
+                        <?php endif; ?>
+                        <?php if ($manifest->get_documentation()): ?>
+                            <a href="<?php echo esc_url($manifest->get_documentation()); ?>" target="_blank" rel="noopener noreferrer" class="button button-link">
+                                <span class="dashicons dashicons-editor-help"></span> <?php _e('Official Docs', 'hooma'); ?>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="hooma-sidebar-card">
+                    <h3 class="hooma-sidebar-subtitle"><?php _e('Compatible Services', 'hooma'); ?></h3>
+                    <div style="margin-top: 10px;">
+                        <?php if (!empty($compatibility)): ?>
+                            <?php foreach ($compatibility as $service): ?>
+                                <div class="hooma-sidebar-service-item">
+                                    <span class="hooma-service-badge badge-<?php echo esc_attr(strtolower($service)); ?>">
+                                        <?php echo esc_html(ucfirst($service)); ?>
+                                    </span>
+                                    <span class="service-label"><?php echo esc_html(ucfirst($service)) . ' Service'; ?></span>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="description"><?php _e('No compatible services declared.', 'hooma'); ?></p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area: Tabs & Detail Views -->
+            <div class="hooma-package-content-area">
+                <div class="hooma-detail-tabs-nav">
+                    <button class="hooma-detail-tab-btn active" onclick="hoomaSwitchDetailTab(event, 'overview')"><?php _e('Overview', 'hooma'); ?></button>
+                    <button class="hooma-detail-tab-btn" onclick="hoomaSwitchDetailTab(event, 'examples')"><?php _e('Examples & Snippets', 'hooma'); ?></button>
+                </div>
+
+                <!-- Tab Content: Overview -->
+                <div id="hooma-tab-overview" class="hooma-detail-tab-pane active">
+                    <?php if (!empty($readme_content)): ?>
+                        <!-- CDN Marked markdown library -->
+                        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+                        <div class="hooma-markdown-body" id="hooma-readme-viewer">
+                            <span class="description"><?php _e('Loading documentation...', 'hooma'); ?></span>
+                        </div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                var rawMarkdown = <?php echo json_encode($readme_content); ?>;
+                                if (window.marked && rawMarkdown) {
+                                    document.getElementById('hooma-readme-viewer').innerHTML = marked.parse(rawMarkdown);
+                                }
+                            });
+                        </script>
+                    <?php else: ?>
+                        <div class="notice notice-info inline">
+                            <p><?php _e('No README.md documentation provided for this package.', 'hooma'); ?></p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Tab Content: Examples -->
+                <div id="hooma-tab-examples" class="hooma-detail-tab-pane">
+                    <?php if (!empty($examples)): ?>
+                        <div class="hooma-examples-explorer">
+                            <!-- Left: List of examples & files -->
+                            <div class="hooma-examples-list-panel">
+                                <?php foreach ($examples as $example): ?>
+                                    <div class="hooma-example-group">
+                                        <h4 class="hooma-example-group-title">
+                                            <span class="dashicons dashicons-portfolio"></span> <?php echo esc_html(ucfirst($example)); ?>
+                                        </h4>
+                                        <ul class="hooma-example-files-list">
+                                            <?php foreach ($examples_data[$example] as $filename => $content): ?>
+                                                <li>
+                                                    <a href="#" class="hooma-example-file-link" onclick="hoomaSelectExampleFile(event, '<?php echo esc_js($example); ?>', '<?php echo esc_js($filename); ?>')">
+                                                        <span class="dashicons dashicons-editor-code"></span> <?php echo esc_html($filename); ?>
+                                                    </a>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+
+                            <!-- Right: Code Snippet Viewer -->
+                            <div class="hooma-code-viewer-panel">
+                                <div class="hooma-code-viewer-header" id="hooma-viewer-header">
+                                    <span class="description"><?php _e('Select a file to view its content', 'hooma'); ?></span>
+                                </div>
+                                <pre class="hooma-code-pre"><code id="hooma-code-body"><?php _e('No file selected.', 'hooma'); ?></code></pre>
+                            </div>
+                        </div>
+
+                        <script>
+                            var hoomaPackageExamples = <?php echo json_encode($examples_data); ?>;
+                            
+                            function hoomaSelectExampleFile(e, example, filename) {
+                                e.preventDefault();
+                                
+                                // Deactivate current active links
+                                document.querySelectorAll('.hooma-example-file-link').forEach(function(el) {
+                                    el.classList.remove('active');
+                                });
+                                e.currentTarget.classList.add('active');
+
+                                var content = hoomaPackageExamples[example] ? hoomaPackageExamples[example][filename] : '';
+                                
+                                document.getElementById('hooma-viewer-header').innerHTML = '<strong>' + example + ' / ' + filename + '</strong>';
+                                var codeBody = document.getElementById('hooma-code-body');
+                                codeBody.textContent = content;
+                            }
+                        </script>
+                    <?php else: ?>
+                        <div class="notice notice-info inline">
+                            <p><?php _e('No usage examples provided for this package.', 'hooma'); ?></p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function hoomaSwitchDetailTab(e, tabId) {
+                e.preventDefault();
+                // Toggle Tab Buttons
+                document.querySelectorAll('.hooma-detail-tab-btn').forEach(function(btn) {
+                    btn.classList.remove('active');
+                });
+                e.currentTarget.classList.add('active');
+
+                // Toggle Tab Panes
+                document.querySelectorAll('.hooma-detail-tab-pane').forEach(function(pane) {
+                    pane.classList.remove('active');
+                });
+                document.getElementById('hooma-tab-' + tabId).classList.add('active');
+            }
+        </script>
+        <?php
     }
 }

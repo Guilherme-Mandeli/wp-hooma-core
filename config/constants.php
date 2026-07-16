@@ -7,7 +7,21 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Plugin Constants
  */
 
-define( 'HOOMA_VERSION', '1.0.0' );
+// Version definition (dynamically read from hooma.php header)
+$hooma_version = '1.0.260716'; // Fallback
+$plugin_file = plugin_dir_path( dirname( __FILE__ ) ) . 'hooma.php';
+if ( function_exists( 'get_file_data' ) ) {
+	$plugin_data = get_file_data( $plugin_file, array( 'Version' => 'Version' ) );
+	if ( ! empty( $plugin_data['Version'] ) ) {
+		$hooma_version = $plugin_data['Version'];
+	}
+} elseif ( file_exists( $plugin_file ) ) {
+	$file_data = file_get_contents( $plugin_file, false, null, 0, 8192 );
+	if ( preg_match( '/^[ \t\/*#@]*Version:(.*)$/mi', $file_data, $match ) ) {
+		$hooma_version = trim( $match[1] );
+	}
+}
+define( 'HOOMA_VERSION', $hooma_version );
 define( 'HOOMA_MODULES_NAMESPACE', 'HoomaModules' );
 
 // Path constants
