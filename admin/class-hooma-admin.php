@@ -529,7 +529,7 @@ class Hooma_Admin
                     </div>
                     <!-- CDN Marked markdown library -->
                     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-                    <div class="hooma-markdown-body" id="hooma-global-doc-body" style="padding: 30px; overflow-y: auto; flex-grow: 1; max-height: 600px; box-sizing: border-box;">
+                    <div class="hooma-markdown-body" id="hooma-global-doc-body" style="padding: 30px; overflow-y: auto; flex-grow: 1; box-sizing: border-box;">
                         <span class="description"><?php _e('No document selected.', 'hooma'); ?></span>
                     </div>
                 </div>
@@ -537,9 +537,13 @@ class Hooma_Admin
 
             <script>
                 var hoomaGlobalDocs = <?php echo json_encode($docs_data); ?>;
+                var hoomaCurrentGlobalGroup = '';
+                var hoomaCurrentGlobalFile = '';
                 
                 function hoomaSelectGlobalDocFile(e, group, filename) {
                     e.preventDefault();
+                    hoomaCurrentGlobalGroup = group;
+                    hoomaCurrentGlobalFile = filename;
                     
                     // Deactivate current active links
                     document.querySelectorAll('.hooma-doc-file-link').forEach(function(el) {
@@ -572,6 +576,71 @@ class Hooma_Admin
                         icon.classList.add('dashicons-arrow-right');
                     }
                 }
+
+                function hoomaResolveRelativePath(currentPath, relativePath) {
+                    var currentParts = currentPath.split('/');
+                    currentParts.pop(); // remove filename
+                    
+                    var relativeParts = relativePath.split('/');
+                    for (var i = 0; i < relativeParts.length; i++) {
+                        var part = relativeParts[i];
+                        if (part === '.' || part === '') {
+                            continue;
+                        } else if (part === '..') {
+                            currentParts.pop();
+                        } else {
+                            currentParts.push(part);
+                        }
+                    }
+                    return currentParts.join('/');
+                }
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    var globalDocBody = document.getElementById('hooma-global-doc-body');
+                    if (globalDocBody) {
+                        globalDocBody.addEventListener('click', function(e) {
+                            var anchor = e.target.closest('a');
+                            if (!anchor) return;
+                            
+                            var href = anchor.getAttribute('href');
+                            if (!href) return;
+                            
+                            if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:') || href.startsWith('#')) {
+                                return;
+                            }
+                            
+                            e.preventDefault();
+                            
+                            var currentKey = (hoomaCurrentGlobalGroup === 'General') ? hoomaCurrentGlobalFile : (hoomaCurrentGlobalGroup + '/' + hoomaCurrentGlobalFile);
+                            var resolvedPath = hoomaResolveRelativePath(currentKey, href);
+                            
+                            var resolvedParts = resolvedPath.split('/');
+                            var targetFilename = resolvedParts.pop();
+                            var targetGroup = resolvedParts.length > 0 ? resolvedParts.join('/') : 'General';
+                            
+                            // Find target link in the menu
+                            var links = document.querySelectorAll('.hooma-doc-file-link');
+                            var targetLink = null;
+                            for (var i = 0; i < links.length; i++) {
+                                var link = links[i];
+                                var onclickAttr = link.getAttribute('onclick');
+                                if (onclickAttr && onclickAttr.includes("'" + targetGroup + "'") && onclickAttr.includes("'" + targetFilename + "'")) {
+                                    targetLink = link;
+                                    break;
+                                }
+                            }
+                            
+                            if (targetLink) {
+                                var groupHeader = targetLink.closest('.hooma-example-group').querySelector('.hooma-example-group-title');
+                                var filesList = targetLink.closest('.hooma-example-files-list');
+                                if (filesList && filesList.style.display === 'none') {
+                                    hoomaToggleDocGroup(groupHeader);
+                                }
+                                targetLink.click();
+                            }
+                        });
+                    }
+                });
             </script>
             <?php
         } else {
@@ -929,7 +998,7 @@ class Hooma_Admin
                                 <div class="hooma-code-viewer-header" id="hooma-doc-viewer-header">
                                     <span class="description"><?php _e('Select a document to view its content', 'hooma'); ?></span>
                                 </div>
-                                <div class="hooma-markdown-body" id="hooma-doc-body" style="padding: 30px; overflow-y: auto; flex-grow: 1; max-height: 600px; box-sizing: border-box;">
+                                <div class="hooma-markdown-body" id="hooma-doc-body" style="padding: 30px; overflow-y: auto; flex-grow: 1; box-sizing: border-box;">
                                     <span class="description"><?php _e('No document selected.', 'hooma'); ?></span>
                                 </div>
                             </div>
@@ -997,6 +1066,72 @@ class Hooma_Admin
                     icon.classList.add('dashicons-arrow-right');
                 }
             }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                var docBody = document.getElementById('hooma-doc-body');
+                if (docBody) {
+                    docBody.addEventListener('click', function(e) {
+                        var anchor = e.target.closest('a');
+                        if (!anchor) return;
+                        var href = anchor.getAttribute('href');
+                        if (!href) return;
+                        if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:') || href.startsWith('#')) return;
+                        
+                        e.preventDefault();
+                        var resolvedFilename = href.split('/').pop();
+                        
+                        var links = document.querySelectorAll('.hooma-doc-file-link');
+                        var targetLink = null;
+                        for (var i = 0; i < links.length; i++) {
+                            var link = links[i];
+                            var onclickAttr = link.getAttribute('onclick');
+                            if (onclickAttr && onclickAttr.includes("'" + resolvedFilename + "'")) {
+                                targetLink = link;
+                                break;
+                            }
+                        }
+                        
+                        if (targetLink) {
+                            targetLink.click();
+                        }
+                    });
+                }
+
+                var readmeViewer = document.getElementById('hooma-readme-viewer');
+                if (readmeViewer) {
+                    readmeViewer.addEventListener('click', function(e) {
+                        var anchor = e.target.closest('a');
+                        if (!anchor) return;
+                        var href = anchor.getAttribute('href');
+                        if (!href) return;
+                        if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:') || href.startsWith('#')) return;
+                        
+                        e.preventDefault();
+                        if (href.startsWith('docs/')) {
+                            var docFilename = href.replace('docs/', '');
+                            var docTabButton = document.querySelector('.hooma-detail-tab-btn[onclick*="docs"]');
+                            if (docTabButton) {
+                                docTabButton.click();
+                                setTimeout(function() {
+                                    var links = document.querySelectorAll('.hooma-doc-file-link');
+                                    var targetLink = null;
+                                    for (var i = 0; i < links.length; i++) {
+                                        var link = links[i];
+                                        var onclickAttr = link.getAttribute('onclick');
+                                        if (onclickAttr && onclickAttr.includes("'" + docFilename + "'")) {
+                                            targetLink = link;
+                                            break;
+                                        }
+                                    }
+                                    if (targetLink) {
+                                        targetLink.click();
+                                    }
+                                }, 50);
+                            }
+                        }
+                    });
+                }
+            });
         </script>
         <?php
     }

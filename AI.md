@@ -29,7 +29,7 @@ Este documento sirve como entrypoint de contexto y mapa de navegación para cual
 
 ## 2. Acceso a Servicios del Core
 
-Todos los servicios provistos por Hooma Core se acceden a través de la fachada estática central `Hooma` ([Hooma.php](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/includes/Hooma.php)).
+Todos los servicios provistos por Hooma Core se acceden a través de la fachada estática central `Hooma` ([includes/Hooma.php](includes/Hooma.php)).
 
 | Servicio | Acceso en Fachada | Propósito / Responsabilidad |
 | :--- | :--- | :--- |
@@ -51,42 +51,42 @@ Todos los servicios provistos por Hooma Core se acceden a través de la fachada 
 
 ## 3. Índice de Documentación por Casos de Uso (AI Directory Map)
 
-Si tienes que programar o modificar una funcionalidad, utiliza esta tabla para encontrar rápidamente la documentación correcta dentro de la carpeta [docs/](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs):
+Si tienes que programar o modificar una funcionalidad, utiliza esta tabla para encontrar rápidamente la documentación correcta dentro de la carpeta [docs/](docs):
 
 ### 🚀 Primeros Pasos y Conceptos
-- **¿Cómo se inicializa el plugin y cuál es el ciclo de vida?** &rarr; [docs/architecture/bootstrap-lifecycle.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/architecture/bootstrap-lifecycle.md) y [docs/concepts/lifecycle.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/concepts/lifecycle.md)
-- **¿Cómo funciona el Contenedor de Servicios?** &rarr; [docs/architecture/service-container.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/architecture/service-container.md)
-- **Guía de instalación inicial** &rarr; [docs/tutorials/01-installation.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/tutorials/01-installation.md)
-- **Preguntas frecuentes generales (FAQ)** &rarr; [docs/faq.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/faq.md)
+- **¿Cómo se inicializa el plugin y cuál es el ciclo de vida?** &rarr; [docs/architecture/bootstrap-lifecycle.md](docs/architecture/bootstrap-lifecycle.md) y [docs/concepts/lifecycle.md](docs/concepts/lifecycle.md)
+- **¿Cómo funciona el Contenedor de Servicios?** &rarr; [docs/architecture/service-container.md](docs/architecture/service-container.md)
+- **Guía de instalación inicial** &rarr; [docs/tutorials/01-installation.md](docs/tutorials/01-installation.md)
+- **Preguntas frecuentes generales (FAQ)** &rarr; [docs/faq.md](docs/faq.md)
 
 ### 📦 Desarrollo de Módulos
-- **Estructura y reglas para crear tu primer módulo** &rarr; [docs/tutorials/02-first-module.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/tutorials/02-first-module.md) y [docs/modules/development-guide.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/modules/development-guide.md)
-- **Buenas prácticas de diseño en módulos** &rarr; [docs/modules/best-practices.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/modules/best-practices.md)
-- **Antipatrones críticos a evitar** &rarr; [docs/modules/anti-patterns.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/modules/anti-patterns.md)
+- **Estructura y reglas para crear tu primer módulo** &rarr; [docs/tutorials/02-first-module.md](docs/tutorials/02-first-module.md) y [docs/modules/development-guide.md](docs/modules/development-guide.md)
+- **Buenas prácticas de diseño en módulos** &rarr; [docs/modules/best-practices.md](docs/modules/best-practices.md)
+- **Antipatrones críticos a evitar** &rarr; [docs/modules/anti-patterns.md](docs/modules/anti-patterns.md)
 
 ### 🖥️ Interfaz de Usuario y WordPress Admin
-- **Crear una página o menú en el WP Admin** &rarr; [docs/cookbook/admin-page.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/cookbook/admin-page.md) y [docs/tutorials/03-admin-page.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/tutorials/03-admin-page.md)
-- **Uso de la UI Kit unificada (`Hooma_UI`)** &rarr; [docs/concepts/ui-kit.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/concepts/ui-kit.md)
-- **Gestión de Assets (CSS/JS)** &rarr; [docs/tutorials/05-assets.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/tutorials/05-assets.md) y [docs/api/assets.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/api/assets.md)
-- **Crear Shortcodes en WordPress** &rarr; [docs/cookbook/shortcodes.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/cookbook/shortcodes.md)
+- **Crear una página o menú en el WP Admin** &rarr; [docs/cookbook/admin-page.md](docs/cookbook/admin-page.md) y [docs/tutorials/03-admin-page.md](docs/tutorials/03-admin-page.md)
+- **Uso de la UI Kit unificada (`Hooma_UI`)** &rarr; [docs/concepts/ui-kit.md](docs/concepts/ui-kit.md)
+- **Gestión de Assets (CSS/JS)** &rarr; [docs/tutorials/05-assets.md](docs/tutorials/05-assets.md) y [docs/api/assets.md](docs/api/assets.md)
+- **Crear Shortcodes en WordPress** &rarr; [docs/cookbook/shortcodes.md](docs/cookbook/shortcodes.md)
 
 ### 💾 Base de Datos y Caché
-- **Uso del servicio Database** &rarr; [docs/tutorials/08-database.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/tutorials/08-database.md) y [docs/api/database.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/api/database.md)
-- **Crear tablas personalizadas (custom tables)** &rarr; [docs/cookbook/custom-database-table.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/cookbook/custom-database-table.md)
-- **Cómo cachear queries de forma óptima** &rarr; [docs/cookbook/cached-queries.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/cookbook/cached-queries.md) y [docs/tutorials/07-cache.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/tutorials/07-cache.md)
+- **Uso del servicio Database** &rarr; [docs/tutorials/08-database.md](docs/tutorials/08-database.md) y [docs/api/database.md](docs/api/database.md)
+- **Crear tablas personalizadas (custom tables)** &rarr; [docs/cookbook/custom-database-table.md](docs/cookbook/custom-database-table.md)
+- **Cómo cachear queries de forma óptima** &rarr; [docs/cookbook/cached-queries.md](docs/cookbook/cached-queries.md) y [docs/tutorials/07-cache.md](docs/tutorials/07-cache.md)
 
 ### 📡 Integración y Red
-- **Registrar y consumir endpoints HTTP** &rarr; [docs/tutorials/06-http.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/tutorials/06-http.md) y [docs/api/http.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/api/http.md)
-- **Consumo de APIs REST paso a paso** &rarr; [docs/cookbook/consume-rest-api.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/cookbook/consume-rest-api.md)
+- **Registrar y consumir endpoints HTTP** &rarr; [docs/tutorials/06-http.md](docs/tutorials/06-http.md) y [docs/api/http.md](docs/api/http.md)
+- **Consumo de APIs REST paso a paso** &rarr; [docs/cookbook/consume-rest-api.md](docs/cookbook/consume-rest-api.md)
 
 ### ⏰ Eventos y Tareas Programadas
-- **Sistema de Eventos (Pub/Sub)** &rarr; [docs/tutorials/09-events.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/tutorials/09-events.md) y [docs/cookbook/events.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/cookbook/events.md)
-- **Scheduler (Tareas programadas - Cron)** &rarr; [docs/tutorials/10-scheduler.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/tutorials/10-scheduler.md) y [docs/cookbook/scheduled-tasks.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/cookbook/scheduled-tasks.md)
+- **Sistema de Eventos (Pub/Sub)** &rarr; [docs/tutorials/09-events.md](docs/tutorials/09-events.md) y [docs/cookbook/events.md](docs/cookbook/events.md)
+- **Scheduler (Tareas programadas - Cron)** &rarr; [docs/tutorials/10-scheduler.md](docs/tutorials/10-scheduler.md) y [docs/cookbook/scheduled-tasks.md](docs/cookbook/scheduled-tasks.md)
 
 ### 📦 Integración de Paquetes Externos (esbuild, Vue, Stripe)
-- **Sistema de Packages de Hooma** &rarr; [docs/packages/packages-system.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/packages/packages-system.md)
-- **Compilar assets con esbuild sin dependencias Node** &rarr; [docs/packages/esbuild.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/packages/esbuild.md)
-- **Uso de Vue.js en WordPress a través de Hooma** &rarr; [docs/packages/vue.md](file:///c:/Users/Recepcio/Documents/Guilherme_Mandeli/Plugins/Hooma%20Core/Hooma/docs/packages/vue.md)
+- **Sistema de Packages de Hooma** &rarr; [docs/packages/packages-system.md](docs/packages/packages-system.md)
+- **Compilar assets con esbuild sin dependencias Node** &rarr; [docs/packages/esbuild.md](docs/packages/esbuild.md)
+- **Uso de Vue.js en WordPress a través de Hooma** &rarr; [docs/packages/vue.md](docs/packages/vue.md)
 
 ---
 
