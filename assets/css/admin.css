@@ -591,11 +591,11 @@
 }
 
 .hooma-status-dot.active {
-    background-color: #4ab866; /* green */
+    background-color: #4ab866;
 }
 
 .hooma-status-dot.inactive {
-    background-color: #d63638; /* red */
+    background-color: #bfbfbf;
 }
 
 .hooma-nav-item-version {
