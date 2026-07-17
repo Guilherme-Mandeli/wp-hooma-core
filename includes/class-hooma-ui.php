@@ -41,7 +41,7 @@ class Hooma_UI
             $url = add_query_arg('tab', $slug);
             echo '<a href="' . esc_url($url) . '" class="nav-tab ' . esc_attr($class) . '">' . esc_html($label) . '</a>';
         }
-        echo '</h2><br>';
+        echo '</h2>';
     }
 
     /**

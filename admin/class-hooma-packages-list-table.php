@@ -101,6 +101,27 @@ class Hooma_Packages_List_Table extends WP_List_Table
             );
         }
 
+        if (current_user_can('manage_options')) {
+            $delete_url = wp_nonce_url(
+                add_query_arg(
+                    array(
+                        'action'  => 'delete_package',
+                        'package' => $item['name'],
+                        'tab'     => 'packages'
+                    ),
+                    admin_url('admin.php?page=hooma-modules')
+                ),
+                'hooma_delete_package'
+            );
+
+            $actions['delete'] = sprintf(
+                '<a href="%s" class="submitdelete" onclick="return confirm(\'%s\');">%s</a>',
+                esc_url($delete_url),
+                esc_js(sprintf(__('Are you sure you want to delete the package "%s"?', 'hooma'), $item['name'])),
+                __('Delete', 'hooma')
+            );
+        }
+
         return sprintf(
             '<a href="%1$s" style="font-weight:600; text-decoration:none; color:#2271b1;">%2$s</a> %3$s',
             esc_url($details_url),

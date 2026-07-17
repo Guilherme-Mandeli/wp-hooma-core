@@ -608,4 +608,290 @@ class Hooma_Installer
 
 		return null;
 	}
+
+	/**
+	 * Install a package from a ZIP file.
+	 *
+	 * @param array $file $_FILES['package_zip'] or similar.
+	 * @return true|WP_Error True on success, WP_Error on failure.
+	 */
+	public function install_package($file)
+	{
+		// 1. Basic PHP Upload Validation
+		if (!isset($file['tmp_name']) || empty($file['tmp_name'])) {
+			return new WP_Error('upload_failed', __('File upload failed.', 'hooma'));
+		}
+
+		if ($file['error'] !== UPLOAD_ERR_OK) {
+			return new WP_Error('upload_error', __('Upload error: ', 'hooma') . $file['error']);
+		}
+
+		// 2. Validate MIME Type
+		$file_type = wp_check_filetype($file['name']);
+		if ($file_type['ext'] !== 'zip') {
+			return new WP_Error('invalid_type', __('Only .zip files are allowed.', 'hooma'));
+		}
+
+		// 3. Prepare Environment
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+		WP_Filesystem();
+		global $wp_filesystem;
+
+		// 4. Unzip to Temp
+		$temp_dir = get_temp_dir() . 'hooma-pkg-install-' . uniqid() . '/';
+		if (!$wp_filesystem->exists($temp_dir)) {
+			$wp_filesystem->mkdir($temp_dir);
+		}
+
+		$unzip_result = unzip_file($file['tmp_name'], $temp_dir);
+		if (is_wp_error($unzip_result)) {
+			$wp_filesystem->delete($temp_dir, true);
+			return $unzip_result;
+		}
+
+		// 5. Validation Logic
+		$validation = $this->validate_package_dir($temp_dir);
+		if (is_wp_error($validation)) {
+			$wp_filesystem->delete($temp_dir, true); // Clean up
+			return $validation;
+		}
+
+		$source = $validation['path'];
+		$new_manifest = $validation['manifest'];
+		$dirname = basename($source); // Package folder name
+
+		$target_packages_dir = HOOMA_PACKAGES_PATH;
+		$can_use_new_path = false;
+		if ($wp_filesystem->exists($target_packages_dir)) {
+			$can_use_new_path = true;
+		} else {
+			$hooma_dir = WP_CONTENT_DIR . '/hooma/';
+			if (!$wp_filesystem->exists($hooma_dir)) {
+				$wp_filesystem->mkdir($hooma_dir);
+			}
+			if ($wp_filesystem->exists($hooma_dir)) {
+				$wp_filesystem->mkdir($target_packages_dir);
+				if ($wp_filesystem->exists($target_packages_dir)) {
+					$can_use_new_path = true;
+				}
+			}
+		}
+
+		$destination = $target_packages_dir . $dirname;
+
+		// 6. Install or Update
+		// Check for existing package
+		if ($wp_filesystem->exists($destination)) {
+			return new WP_Error(
+				'folder_exists',
+				sprintf(
+					__('The package directory "%s" already exists.', 'hooma'),
+					$dirname
+				),
+				array(
+					'temp_dir' => $temp_dir,
+					'package_slug' => $dirname,
+					'destination' => $destination,
+					'new_manifest' => $new_manifest
+				)
+			);
+		} else {
+			// New Install Flow
+			return $this->finalize_package_install($temp_dir, false);
+		}
+	}
+
+	/**
+	 * Validate a package directory inside temp.
+	 *
+	 * @param string $temp_dir Path to the unzipped files.
+	 * @return array|WP_Error Array with 'path' and 'manifest' array, or WP_Error.
+	 */
+	private function validate_package_dir($temp_dir)
+	{
+		global $wp_filesystem;
+
+		// 1. Directory Structure (Single Root)
+		$items = $wp_filesystem->dirlist($temp_dir);
+		if (!$items) {
+			return new WP_Error('empty_zip', __('The package is empty.', 'hooma'));
+		}
+
+		$dirs = array();
+		$files_at_root = array();
+
+		foreach ($items as $name => $info) {
+			if ($name === '__MACOSX' || $name === '.' || $name === '..') {
+				continue;
+			}
+			if ($info['type'] === 'd') {
+				$dirs[] = $name;
+			} elseif ($info['type'] === 'f') {
+				$files_at_root[] = $name;
+			}
+		}
+
+		if (count($dirs) !== 1 || !empty($files_at_root)) {
+			return new WP_Error('invalid_structure', __('Invalid structure: The ZIP must contain exactly one root folder.', 'hooma'));
+		}
+
+		$package_root_name = $dirs[0];
+		$package_path = $temp_dir . $package_root_name;
+		$manifest_path = $package_path . '/manifest.json';
+
+		// 2. manifest.json exists
+		if (!$wp_filesystem->exists($manifest_path)) {
+			return new WP_Error('missing_manifest', __('Invalid Structure: Missing manifest.json in the package root.', 'hooma'));
+		}
+
+		// 3. JSON valid
+		$json_content = $wp_filesystem->get_contents($manifest_path);
+		if ($json_content === false) {
+			return new WP_Error('cannot_read_manifest', __('Cannot read manifest.json file.', 'hooma'));
+		}
+
+		$manifest_data = json_decode($json_content, true);
+		if (json_last_error() !== JSON_ERROR_NONE) {
+			return new WP_Error('invalid_json', sprintf(__('Invalid manifest.json: %s', 'hooma'), json_last_error_msg()));
+		}
+
+		// 4. Validate mandatory properties (name, version, type)
+		if (empty($manifest_data['name']) || !is_string($manifest_data['name'])) {
+			return new WP_Error('missing_manifest_name', __('The package manifest must contain a valid "name" string.', 'hooma'));
+		}
+
+		if ($manifest_data['name'] !== $package_root_name) {
+			return new WP_Error('mismatch_name', sprintf(__('The package "name" in manifest.json ("%s") must match the zip root directory name ("%s").', 'hooma'), $manifest_data['name'], $package_root_name));
+		}
+
+		if (empty($manifest_data['version']) || !is_string($manifest_data['version'])) {
+			return new WP_Error('missing_manifest_version', __('The package manifest must contain a valid "version" string.', 'hooma'));
+		}
+
+		if (!preg_match('/^\d+(\.\d+)*(-[a-zA-Z0-9\.]+)?$/', $manifest_data['version'])) {
+			return new WP_Error('invalid_manifest_version', sprintf(__('The package version "%s" is invalid.', 'hooma'), $manifest_data['version']));
+		}
+
+		if (empty($manifest_data['type']) || !is_string($manifest_data['type'])) {
+			return new WP_Error('missing_manifest_type', __('The package manifest must contain a valid "type" string.', 'hooma'));
+		}
+
+		// Check type validity
+		if (class_exists('Hooma\Core\Services\Packages\PackageType')) {
+			$type_enum = \Hooma\Core\Services\Packages\PackageType::tryFrom(strtolower($manifest_data['type']));
+			if ($type_enum === null) {
+				return new WP_Error('invalid_manifest_type', sprintf(__('The package type "%s" is invalid.', 'hooma'), $manifest_data['type']));
+			}
+		} else {
+			$valid_types = array('javascript', 'php', 'binary', 'asset', 'template', 'schema');
+			if (!in_array(strtolower($manifest_data['type']), $valid_types, true)) {
+				return new WP_Error('invalid_manifest_type', sprintf(__('The package type "%s" is invalid. Allowed types: %s', 'hooma'), $manifest_data['type'], implode(', ', $valid_types)));
+			}
+		}
+
+		// 5. Entries check
+		if (isset($manifest_data['entries'])) {
+			if (!is_array($manifest_data['entries'])) {
+				return new WP_Error('invalid_manifest_entries', __('The "entries" property must be an object/array.', 'hooma'));
+			}
+			foreach ($manifest_data['entries'] as $key => $relative_file) {
+				if (!is_string($relative_file)) {
+					continue;
+				}
+				$entry_file_path = $package_path . '/' . ltrim($relative_file, '/');
+				if (!$wp_filesystem->exists($entry_file_path)) {
+					return new WP_Error(
+						'missing_entry_file',
+						sprintf(__('The entry file "%s" declared for "%s" does not exist in the package.', 'hooma'), $relative_file, $key)
+					);
+				}
+			}
+		}
+
+		return array(
+			'path' => $package_path,
+			'manifest' => $manifest_data
+		);
+	}
+
+	/**
+	 * Finalize package installation.
+	 *
+	 * @param string $temp_dir Path to the unzipped package in temp.
+	 * @param bool   $overwrite Whether to overwrite existing package.
+	 * @return true|WP_Error
+	 */
+	public function finalize_package_install($temp_dir, $overwrite = false)
+	{
+		global $wp_filesystem;
+
+		$validation = $this->validate_package_dir($temp_dir);
+		if (is_wp_error($validation)) {
+			$wp_filesystem->delete($temp_dir, true);
+			return $validation;
+		}
+
+		$source = $validation['path'];
+		$dirname = basename($source);
+
+		$target_packages_dir = HOOMA_PACKAGES_PATH;
+		$destination = $target_packages_dir . $dirname;
+
+		if ($wp_filesystem->exists($destination)) {
+			if ($overwrite) {
+				$wp_filesystem->delete($destination, true);
+			} else {
+				$wp_filesystem->delete($temp_dir, true);
+				return new WP_Error('folder_exists', __('Directory already exists and overwrite was not authorized.', 'hooma'));
+			}
+		}
+
+		// Move files
+		$copy_result = copy_dir($source, $destination);
+
+		// Clean up temp
+		$wp_filesystem->delete($temp_dir, true);
+
+		if (is_wp_error($copy_result)) {
+			return $copy_result;
+		}
+
+		if (!$copy_result) {
+			return new WP_Error('copy_failed', __('Failed to move files to the packages directory.', 'hooma'));
+		}
+
+		return true;
+	}
+
+	/**
+	 * Uninstall a package.
+	 *
+	 * @param string $package_slug The slug of the package to uninstall.
+	 * @return true|WP_Error True on success, WP_Error on failure.
+	 */
+	public function uninstall_package($package_slug)
+	{
+		$package_dir = HOOMA_PACKAGES_PATH . $package_slug;
+
+		global $wp_filesystem;
+		if (!$wp_filesystem) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
+
+		if (!$wp_filesystem->exists($package_dir)) {
+			return new WP_Error('package_not_found', __('Package not found.', 'hooma'));
+		}
+
+		// Delete Files
+		if (!$wp_filesystem->delete($package_dir, true)) {
+			return new WP_Error('delete_failed', __('Failed to remove package files.', 'hooma'));
+		}
+
+		return true;
+	}
 }

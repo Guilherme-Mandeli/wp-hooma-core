@@ -94,6 +94,35 @@ Para evitar colisiones con entornos de Node.js/npm, Hooma utiliza un archivo lla
 | `keywords` | `array` | No | Colección de palabras clave para búsquedas internas. |
 | `entries` | `object` | No | Mapeo de puntos de entrada nombrados (ej: `production`, `development`, `esm`) a sus archivos físicos relativos. |
 
+### Manifiesto Mínimo Obligatorio
+Para que el cargador de Hooma reconozca un paquete y lo muestre en la tabla de administración de forma satisfactoria, el archivo `manifest.json` solo requiere obligatoriamente tres campos mínimos:
+- `name`: Identificador único (slug) del paquete (ej. `"esbuild"`). Debe coincidir exactamente con el nombre de la carpeta raíz del ZIP.
+- `version`: Versión semántica del paquete (ej. `"0.20.1"`).
+- `type`: Tipo de paquete (uno de los valores de `PackageType` en minúsculas: `"javascript"`, `"php"`, `"binary"`, `"asset"`, `"template"`, `"schema"`).
+
+Ejemplo de `manifest.json` mínimo:
+```json
+{
+    "name": "esbuild",
+    "version": "0.20.1",
+    "type": "binary"
+}
+```
+
+### Reglas para la Carga de Paquetes en ZIP
+La instalación o actualización de un paquete a través del administrador exige cumplir con las siguientes directrices de empaquetado:
+1. **Archivo ZIP**: Debe ser un único archivo `.zip` comprimido sin cifrar ni contraseña.
+2. **Carpeta Raíz Única**: La raíz del archivo ZIP debe contener exactamente una única carpeta, cuyo nombre debe coincidir con el campo `name` declarado en el archivo `manifest.json`.
+3. **Ubicación del Manifiesto**: El archivo `manifest.json` debe estar ubicado directamente en la raíz de la carpeta mencionada en el punto anterior.
+
+Por ejemplo, al comprimir un paquete llamado `esbuild`, el archivo `esbuild.zip` debe tener la siguiente estructura interna:
+```text
+esbuild.zip
+└── esbuild/
+    ├── manifest.json
+    └── ... (resto de archivos y subcarpetas)
+```
+
 ### Ciclo de Vida y Actualización del Manifiesto
 
 #### ¿Dónde se actualiza?

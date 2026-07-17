@@ -88,10 +88,19 @@ class Hooma_Admin
                     case 'deactivated':
                         add_settings_error('hooma_messages', 'hooma_message', __('Module deactivated successfully.', 'hooma'), 'success');
                         break;
+                    case 'package_installed':
+                        add_settings_error('hooma_messages', 'hooma_install_success', __('Package installed successfully.', 'hooma'), 'success');
+                        break;
+                    case 'package_updated':
+                        add_settings_error('hooma_messages', 'hooma_install_success', __('Package updated successfully.', 'hooma'), 'success');
+                        break;
+                    case 'package_deleted':
+                        add_settings_error('hooma_messages', 'hooma_message', __('Package deleted successfully.', 'hooma'), 'success');
+                        break;
                 }
             }
 
-            // Handle Install
+            // Handle Install Module
             if (isset($_POST['hooma_action']) && $_POST['hooma_action'] === 'install_module') {
                 check_admin_referer('hooma_install_module');
 
@@ -107,6 +116,7 @@ class Hooma_Admin
                     if ($result->get_error_code() === 'folder_exists') {
                         // Handle Confirmation Flow
                         $error_data = $result->get_error_data();
+                        $error_data['install_type'] = 'module';
                         set_transient('hooma_overwrite_data_' . get_current_user_id(), $error_data, 600); // 10 minutes
 
                         // Redirect to show confirmation
@@ -117,6 +127,37 @@ class Hooma_Admin
                 } else {
                     // Redirect on success
                     wp_safe_redirect(admin_url('admin.php?page=hooma-modules&hooma_message=installed'));
+                    exit;
+                }
+            }
+
+            // Handle Install Package
+            if (isset($_POST['hooma_action']) && $_POST['hooma_action'] === 'install_package') {
+                check_admin_referer('hooma_install_package');
+
+                if (!current_user_can('upload_files')) {
+                    wp_die(__('You do not have permission to do this.', 'hooma'));
+                }
+
+                require_once HOOMA_PATH . 'includes/class-hooma-installer.php';
+                $installer = new Hooma_Installer();
+                $result = $installer->install_package($_FILES['package_zip']);
+
+                if (is_wp_error($result)) {
+                    if ($result->get_error_code() === 'folder_exists') {
+                        // Handle Confirmation Flow
+                        $error_data = $result->get_error_data();
+                        $error_data['install_type'] = 'package';
+                        set_transient('hooma_overwrite_data_' . get_current_user_id(), $error_data, 600); // 10 minutes
+
+                        // Redirect to show confirmation
+                        wp_safe_redirect(add_query_arg('hooma_confirm_overwrite', '1', wp_get_referer()));
+                        exit;
+                    }
+                    add_settings_error('hooma_messages', 'hooma_install_error', $result->get_error_message(), 'error');
+                } else {
+                    // Redirect on success
+                    wp_safe_redirect(admin_url('admin.php?page=hooma-modules&tab=packages&hooma_message=package_installed'));
                     exit;
                 }
             }
@@ -147,17 +188,30 @@ class Hooma_Admin
                     require_once HOOMA_PATH . 'includes/class-hooma-installer.php';
                     $installer = new Hooma_Installer();
 
-                    // Call finalize_install with overwrite = true
-                    $result = $installer->finalize_install($data['temp_dir'], true);
+                    if (isset($data['install_type']) && $data['install_type'] === 'package') {
+                        // Call finalize_package_install with overwrite = true
+                        $result = $installer->finalize_package_install($data['temp_dir'], true);
+                        delete_transient('hooma_overwrite_data_' . get_current_user_id());
 
-                    delete_transient('hooma_overwrite_data_' . get_current_user_id());
-
-                    if (is_wp_error($result)) {
-                        add_settings_error('hooma_messages', 'hooma_install_error', $result->get_error_message(), 'error');
+                        if (is_wp_error($result)) {
+                            add_settings_error('hooma_messages', 'hooma_install_error', $result->get_error_message(), 'error');
+                        } else {
+                            // Redirect on success
+                            wp_safe_redirect(admin_url('admin.php?page=hooma-modules&tab=packages&hooma_message=package_updated'));
+                            exit;
+                        }
                     } else {
-                        // Redirect on success
-                        wp_safe_redirect(admin_url('admin.php?page=hooma-modules&hooma_message=updated'));
-                        exit;
+                        // Call finalize_install with overwrite = true
+                        $result = $installer->finalize_install($data['temp_dir'], true);
+                        delete_transient('hooma_overwrite_data_' . get_current_user_id());
+
+                        if (is_wp_error($result)) {
+                            add_settings_error('hooma_messages', 'hooma_install_error', $result->get_error_message(), 'error');
+                        } else {
+                            // Redirect on success
+                            wp_safe_redirect(admin_url('admin.php?page=hooma-modules&hooma_message=updated'));
+                            exit;
+                        }
                     }
                 }
             }
@@ -232,6 +286,37 @@ class Hooma_Admin
                     }
                 }
             }
+
+            // Delete Package Action
+            if (isset($_REQUEST['action']) && $_REQUEST['action'] === 'delete_package') {
+                if (!wp_verify_nonce($_REQUEST['_wpnonce'], 'hooma_delete_package')) {
+                    wp_die(__('Invalid action.', 'hooma'));
+                }
+
+                if (!current_user_can('manage_options')) {
+                    wp_die(__('You do not have permission to do this.', 'hooma'));
+                }
+
+                $package_slug = sanitize_text_field($_REQUEST['package']);
+
+                // Instantiate Installer
+                require_once HOOMA_PATH . 'includes/class-hooma-installer.php';
+                $installer = new Hooma_Installer();
+                $result = $installer->uninstall_package($package_slug);
+
+                if (is_wp_error($result)) {
+                    add_settings_error(
+                        'hooma_messages',
+                        'hooma_message',
+                        __('Error deleting package: ', 'hooma') . $result->get_error_message(),
+                        'error'
+                    );
+                } else {
+                    // Redirect on success
+                    wp_safe_redirect(admin_url('admin.php?page=hooma-modules&tab=packages&hooma_message=package_deleted'));
+                    exit;
+                }
+            }
         }
     }
 
@@ -252,6 +337,7 @@ class Hooma_Admin
         if (isset($_GET['hooma_confirm_overwrite'])) {
             $data = get_transient('hooma_overwrite_data_' . get_current_user_id());
             if ($data) {
+                $is_package = isset($data['install_type']) && $data['install_type'] === 'package';
                 ?>
                 <div class="hooma-header">
                     <h1 class="wp-heading-inline"><?php _e('Installation Conflict', 'hooma'); ?></h1>
@@ -259,18 +345,40 @@ class Hooma_Admin
 
                 <div class="card" style="max-width: 600px; padding: 20px; margin-top: 20px; border-left: 4px solid #ffba00;">
                     <h2 class="title">
-                        <?php printf(__('The module directory "%s" already exists.', 'hooma'), esc_html($data['module_slug'])); ?>
+                        <?php 
+                        if ($is_package) {
+                            printf(__('The package directory "%s" already exists.', 'hooma'), esc_html($data['package_slug']));
+                        } else {
+                            printf(__('The module directory "%s" already exists.', 'hooma'), esc_html($data['module_slug']));
+                        }
+                        ?>
                     </h2>
-                    <p><?php _e('This usually means a version of this module is already installed.', 'hooma'); ?></p>
+                    <p>
+                        <?php 
+                        if ($is_package) {
+                            _e('This usually means a version of this package is already installed.', 'hooma');
+                        } else {
+                            _e('This usually means a version of this module is already installed.', 'hooma');
+                        }
+                        ?>
+                    </p>
                     <p><strong><?php _e('Do you want to replace the existing version with the uploaded version?', 'hooma'); ?></strong>
                     </p>
 
                     <ul style="background: #f0f0f1; padding: 15px; border-radius: 4px;">
-                        <li><strong><?php _e('Module:', 'hooma'); ?></strong> <?php echo esc_html($data['module_slug']); ?></li>
-                        <li><strong><?php _e('Namespace:', 'hooma'); ?></strong>
-                            <?php echo esc_html($data['new_headers']['HOOMA_MODULE_NAMESPACE']); ?></li>
-                        <li><strong><?php _e('Package Version:', 'hooma'); ?></strong>
-                            <?php echo esc_html($data['new_headers']['Version']); ?></li>
+                        <?php if ($is_package) : ?>
+                            <li><strong><?php _e('Package:', 'hooma'); ?></strong> <?php echo esc_html($data['package_slug']); ?></li>
+                            <li><strong><?php _e('Type:', 'hooma'); ?></strong>
+                                <?php echo esc_html($data['new_manifest']['type']); ?></li>
+                            <li><strong><?php _e('Version:', 'hooma'); ?></strong>
+                                <?php echo esc_html($data['new_manifest']['version']); ?></li>
+                        <?php else : ?>
+                            <li><strong><?php _e('Module:', 'hooma'); ?></strong> <?php echo esc_html($data['module_slug']); ?></li>
+                            <li><strong><?php _e('Namespace:', 'hooma'); ?></strong>
+                                <?php echo esc_html($data['new_headers']['HOOMA_MODULE_NAMESPACE']); ?></li>
+                            <li><strong><?php _e('Version:', 'hooma'); ?></strong>
+                                <?php echo esc_html($data['new_headers']['Version']); ?></li>
+                        <?php endif; ?>
                     </ul>
 
                     <form method="post" action="">
@@ -294,10 +402,10 @@ class Hooma_Admin
             <h1 class="wp-heading-inline">Hooma Core</h1>
             <?php if ($current_tab === 'modules') : ?>
                 <a href="#" id="hooma-add-module-btn" class="page-title-action"><?php _e('Add Module', 'hooma'); ?></a>
+            <?php elseif ($current_tab === 'packages') : ?>
+                <a href="#" id="hooma-add-package-btn" class="page-title-action"><?php _e('Add Package', 'hooma'); ?></a>
             <?php endif; ?>
         </div>
-
-
 
         <?php if ($current_tab === 'modules') : ?>
             <!-- Upload Form (Hidden by default) -->
@@ -354,6 +462,81 @@ class Hooma_Admin
                                 var fileName = this.files[0].name;
                                 if (title) {
                                     title.textContent = '<?php echo esc_js(__('Upload module:', 'hooma')); ?>';
+                                }
+                                if (hint) {
+                                    hint.textContent = fileName;
+                                }
+                            } else {
+                                if (title) {
+                                    title.textContent = '<?php echo esc_js(__('Upload ZIP File', 'hooma')); ?>';
+                                }
+                                if (hint) {
+                                    hint.textContent = '<?php echo esc_js(__('Drag file here or click to select', 'hooma')); ?>';
+                                }
+                            }
+                        });
+                    }
+                });
+            </script>
+        <?php elseif ($current_tab === 'packages') : ?>
+            <!-- Upload Form (Hidden by default) -->
+            <div id="hooma-upload-package-container" class="card" style="display:none; margin-top: 20px; padding: 20px; max-width: 600px;">
+                <h2 style="margin-top: 0;"><?php _e('Install New Package', 'hooma'); ?></h2>
+
+                <p class="description" style="margin-bottom: 15px; color: #d63638; font-weight: 500;">
+                    <?php _e('Attention: The ZIP package must contain a single root folder with the package slug, containing a valid "manifest.json" file at its root. The manifest.json must contain at least: "name", "version", and "type".', 'hooma'); ?>
+                </p>
+
+                <form method="post" enctype="multipart/form-data" action="">
+                    <?php wp_nonce_field('hooma_install_package'); ?>
+                    <input type="hidden" name="hooma_action" value="install_package">
+
+                    <label class="wp-upload-box">
+                        <input type="file" name="package_zip" accept=".zip" required>
+                        <span class="wp-upload-content">
+                            <strong><?php _e('Upload ZIP File', 'hooma'); ?></strong>
+                            <span class="wp-upload-hint"><?php _e('Drag file here or click to select', 'hooma'); ?></span>
+                        </span>
+                    </label>
+
+                    <div class="hooma-upload-actions">
+                        <button type="button" class="button" id="hooma-cancel-package-upload"><?php _e('Cancel', 'hooma'); ?></button>
+                        <?php submit_button(__('Install Now', 'hooma'), 'primary', 'install', false); ?>
+                    </div>
+                </form>
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    var btn = document.getElementById('hooma-add-package-btn');
+                    var container = document.getElementById('hooma-upload-package-container');
+                    var cancel = document.getElementById('hooma-cancel-package-upload');
+
+                    if (btn && container) {
+                        btn.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            container.style.display = container.style.display === 'none' ? 'block' : 'none';
+                        });
+                    }
+                    if (cancel) {
+                        cancel.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            container.style.display = 'none';
+                        });
+                    }
+
+                    // File Upload Dynamic Text
+                    var fileInput = document.querySelector('input[name="package_zip"]');
+                    if (fileInput) {
+                        fileInput.addEventListener('change', function () {
+                            var wrapper = this.closest('.wp-upload-box');
+                            var title = wrapper.querySelector('strong');
+                            var hint = wrapper.querySelector('.wp-upload-hint');
+
+                            if (this.files && this.files.length > 0) {
+                                var fileName = this.files[0].name;
+                                if (title) {
+                                    title.textContent = '<?php echo esc_js(__('Upload package:', 'hooma')); ?>';
                                 }
                                 if (hint) {
                                     hint.textContent = fileName;
