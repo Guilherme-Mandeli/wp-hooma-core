@@ -1,3 +1,8 @@
+.hooma-explorer-sidebar a:focus {
+    box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus,1.5px) var(--wp-admin-theme-color,#3858e9) !important;
+    border-radius: 0 !important;
+}
+
 .wp-upload-box {
     display: block;
     border: 1px dashed #c3c4c7;
@@ -10,8 +15,8 @@
 }
 
 .wp-upload-box:hover {
-    border-color: #2271b1;
-    background: #f0f6fc;
+    border-color: #2271b1 !important;
+    background: #f0f6fc !important;
 }
 
 .wp-upload-box input[type="file"] {
@@ -278,6 +283,10 @@
     color: #2c3338;
 }
 
+.hooma-markdown-body > :is(h1, h2, h3, h4, h5, h6):first-child {
+    margin-top: 0;
+}
+
 .hooma-markdown-body h1, 
 .hooma-markdown-body h2, 
 .hooma-markdown-body h3 {
@@ -426,4 +435,498 @@
 
 .hooma-code-pre code {
     font-family: inherit;
+}
+
+/* Layout General de Hooma Explorer */
+.hooma-explorer-layout {
+    display: flex;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    margin-top: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    min-height: 600px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+/* Sidebar */
+.hooma-explorer-sidebar {
+    width: 280px;
+    background: #f6f7f7;
+    border-right: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.hooma-explorer-search-wrapper {
+    padding: 16px;
+    border-bottom: 1px solid #e0e0e0;
+    position: relative;
+}
+
+.hooma-explorer-search-wrapper .dashicons {
+    position: absolute;
+    left: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #757575;
+}
+
+.hooma-explorer-search-wrapper input {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+    background: #ffffff;
+    color: #1d2327;
+    font-size: 13px;
+    line-height: 1.5;
+    box-sizing: border-box;
+    transition: border-color 0.1s linear, box-shadow 0.1s linear;
+}
+
+.hooma-explorer-search-wrapper input:focus {
+    border-color: #3858e9;
+    box-shadow: 0 0 0 1px #3858e9;
+    outline: 2px solid transparent;
+}
+
+.hooma-sidebar-nav {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px 0;
+}
+
+.hooma-nav-section {
+    margin-bottom: 16px;
+}
+
+.hooma-nav-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #757575;
+    letter-spacing: 0.5px;
+    padding: 8px 16px 4px 16px;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hooma-nav-add-btn {
+    color: #757575;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    padding: 2px;
+    transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.hooma-nav-add-btn:hover {
+    background-color: #e0e0e0;
+    color: #1d2327;
+}
+
+.hooma-nav-add-btn .dashicons {
+    line-height: 24px;
+}
+
+.hooma-nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.hooma-nav-list li {
+    margin: 0;
+    padding: 0;
+}
+
+.hooma-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    color: #1d2327;
+    text-decoration: none;
+    font-size: 13px;
+    line-height: 1.4;
+    box-shadow: inset 3px 0px 0px transparent;
+    transition: background-color 0.1s ease, border-left-color 0.1s ease;
+}
+
+.hooma-nav-item:hover {
+    background-color: #f0f0f1;
+    color: #1d2327;
+}
+
+.hooma-nav-item.active {
+    background-color: #ffffff;
+    color: #3858e9;
+    box-shadow: inset 3px 0px 0px #3858e9;
+    font-weight: 600;
+}
+
+.hooma-nav-item .dashicons {
+    color: #757575;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.hooma-nav-item.active .dashicons {
+    color: #3858e9;
+}
+
+.hooma-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.hooma-status-dot.active {
+    background-color: #4ab866; /* green */
+}
+
+.hooma-status-dot.inactive {
+    background-color: #d63638; /* red */
+}
+
+.hooma-nav-item-version {
+    font-size: 10px;
+    color: #757575;
+    margin-left: auto;
+}
+
+/* Canvas de Trabajo */
+.hooma-explorer-canvas {
+    flex-grow: 1;
+    background: #ffffff;
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.hooma-canvas-view {
+    display: none;
+}
+
+.hooma-canvas-view.active {
+    display: block;
+}
+
+/* Overview Dashboard */
+.hooma-overview-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.hooma-overview-card h2 {
+    margin-top: 0;
+    font-size: 20px;
+    color: #1d2327;
+}
+
+.hooma-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.hooma-stat-box {
+    background: #f6f7f7;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 16px;
+    text-align: center;
+}
+
+.hooma-stat-box .stat-val {
+    font-size: 28px;
+    font-weight: 700;
+    color: #3858e9;
+    line-height: 1.2;
+}
+
+.hooma-stat-box .stat-lbl {
+    font-size: 12px;
+    color: #757575;
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+/* Módulo o Paquete Card Grid */
+.hooma-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.hooma-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: border-color 0.1s ease, box-shadow 0.1s ease;
+}
+
+.hooma-card:hover {
+    border-color: #3858e9;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.hooma-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.hooma-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1d2327;
+    margin: 0;
+}
+
+.hooma-card-version {
+    font-size: 11px;
+    color: #757575;
+    background: #f0f0f1;
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-family: monospace;
+}
+
+.hooma-card-desc {
+    font-size: 13px;
+    color: #50575e;
+    line-height: 1.4;
+    margin: 0 0 16px 0;
+    flex-grow: 1;
+}
+
+.hooma-card-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 12px;
+}
+
+/* Detalle del Módulo / Paquete */
+.hooma-detail-view-header {
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+}
+
+.hooma-detail-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.hooma-detail-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1d2327;
+    margin: 0;
+}
+
+.hooma-detail-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 24px;
+}
+
+@media (max-width: 900px) {
+    .hooma-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.hooma-detail-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.hooma-detail-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 16px;
+}
+
+.hooma-detail-card h3 {
+    margin-top: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d2327;
+    border-bottom: 1px solid #f0f0f1;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+.hooma-detail-card-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.hooma-detail-card-table th,
+.hooma-detail-card-table td {
+    padding: 6px 0;
+    font-size: 12px;
+    line-height: 1.4;
+    vertical-align: top;
+}
+
+.hooma-detail-card-table th {
+    font-weight: 600;
+    color: #757575;
+    text-align: left;
+    width: 90px;
+}
+
+.hooma-detail-card-table td {
+    color: #1d2327;
+}
+
+.hooma-detail-main {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Tabs internas de detalles */
+.hooma-detail-tabs-nav {
+    display: flex;
+    background: #f6f7f7;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 0 10px;
+}
+
+.hooma-detail-tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 4px solid transparent;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #50575e;
+    cursor: pointer;
+    transition: all 0.1s ease;
+}
+
+.hooma-detail-tab-btn:hover {
+    color: #3858e9;
+}
+
+.hooma-detail-tab-btn.active {
+    color: #3858e9;
+    border-bottom-color: #3858e9;
+}
+
+.hooma-detail-tab-pane {
+    display: none;
+    padding: 24px;
+}
+
+.hooma-detail-tab-pane.active {
+    display: block;
+}
+
+/* Notificación de Alertas estilo Gutenberg */
+.hooma-alert {
+    background: #ffffff;
+    border-left: 4px solid #3858e9;
+    border: 1px solid #e0e0e0;
+    border-left-width: 4px;
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.hooma-alert.alert-error {
+    border-left-color: #d63638;
+}
+
+.hooma-alert.alert-warning {
+    border-left-color: #f0b849;
+}
+
+.hooma-alert.alert-success {
+    border-left-color: #4ab866;
+}
+
+/* Badge en la cabecera */
+.hooma-badge-pill {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.hooma-badge-pill.pill-active {
+    background: #efeefc;
+    color: #3858e9;
+}
+
+.hooma-badge-pill.pill-inactive {
+    background: #f0f0f1;
+    color: #50575e;
+}
+
+.hooma-sidebar-doc-group-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #50575e;
+    padding: 6px 16px 6px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.1s ease;
+}
+
+.hooma-sidebar-doc-group-title:hover {
+    color: #3858e9;
+}
+
+.hooma-sidebar-doc-group-title .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: #757575;
+    line-height: 14px;
+}
+
+.hooma-sidebar-doc-group-title:hover .dashicons {
+    color: #3858e9;
 }
