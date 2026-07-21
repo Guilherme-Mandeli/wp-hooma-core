@@ -273,47 +273,18 @@ class Package
     }
 
     /**
-     * Obtiene la lista de archivos de documentación (.md) del paquete.
+     * Obtiene los archivos de documentación (.md) del paquete estructurados por grupos.
      *
-     * @return string[]
+     * @return array
      */
     public function get_docs(): array
     {
-        $docs_dir = $this->path . '/docs';
-        if (!is_dir($docs_dir)) {
-            return array();
+        if (function_exists('hooma_scan_docs_directory')) {
+            return hooma_scan_docs_directory($this->path);
         }
-        $items = scandir($docs_dir);
-        if ($items === false) {
-            return array();
-        }
-        $docs = array();
-        foreach ($items as $item) {
-            if ($item === '.' || $item === '..') {
-                continue;
-            }
-            if (is_file($docs_dir . '/' . $item) && strtolower(pathinfo($item, PATHINFO_EXTENSION)) === 'md') {
-                $docs[] = $item;
-            }
-        }
-        return $docs;
+        return array();
     }
 
-    /**
-     * Obtiene el contenido de un archivo de documentación específico.
-     *
-     * @param string $filename Nombre del archivo de documentación.
-     * @return string
-     */
-    public function get_doc_content(string $filename): string
-    {
-        $file_path = $this->path . '/docs/' . sanitize_file_name($filename);
-        if (!is_file($file_path) || strtolower(pathinfo($file_path, PATHINFO_EXTENSION)) !== 'md') {
-            return '';
-        }
-        $content = file_get_contents($file_path);
-        return $content !== false ? $content : '';
-    }
 
     /**
      * Obtiene los servicios compatibles declarados.

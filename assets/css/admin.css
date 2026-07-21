@@ -254,14 +254,15 @@
     transition: all 0.15s ease;
 }
 
-.hooma-detail-tab-btn:hover {
+.hooma-detail-tab-btn:hover:not(.active) {
     background: #f0f0f1;
-    color: #1d2327;
+    color: #1d2327 !important;
 }
 
 .hooma-detail-tab-btn.active {
     background: #ffffff;
     color: #2271b1;
+    padding-bottom: 13px;
     border-bottom: 2px solid #2271b1;
     margin-bottom: -1px;
 }
@@ -555,7 +556,7 @@
     text-decoration: none;
     font-size: 13px;
     line-height: 1.4;
-    box-shadow: inset 3px 0px 0px transparent;
+    box-shadow: inset 2px 0px 0px transparent;
     transition: background-color 0.1s ease, border-left-color 0.1s ease;
 }
 
@@ -567,7 +568,7 @@
 .hooma-nav-item.active {
     background-color: #ffffff;
     color: #3858e9;
-    box-shadow: inset 3px 0px 0px #3858e9;
+    box-shadow: inset 2px 0px 0px #3858e9;
     font-weight: 600;
 }
 
@@ -830,7 +831,7 @@
 .hooma-detail-tab-btn {
     background: none;
     border: none;
-    border-bottom: 4px solid transparent;
+    border-bottom: 2px solid transparent;
     padding: 12px 16px;
     font-size: 13px;
     font-weight: 600;
@@ -886,11 +887,22 @@
 
 /* Badge en la cabecera */
 .hooma-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     padding: 4px 8px;
     border-radius: 12px;
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
+}
+
+.hooma-badge-pill .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    line-height: 1;
+    display: inline-block;
 }
 
 .hooma-badge-pill.pill-active {
@@ -916,7 +928,8 @@
 }
 
 .hooma-sidebar-doc-group-title:hover {
-    color: #3858e9;
+    background: #f0f0f1;
+    color: #1d2327 !important;
 }
 
 .hooma-sidebar-doc-group-title .dashicons {
@@ -928,5 +941,5 @@
 }
 
 .hooma-sidebar-doc-group-title:hover .dashicons {
-    color: #3858e9;
+    color: #1d2327 !important;
 }

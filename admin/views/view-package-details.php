@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
     <div class="hooma-detail-view-header">
         <div class="hooma-detail-title-row">
             <h2 class="hooma-detail-title" id="pkg-detail-name">Package Name</h2>
-            <span class="hooma-badge-pill pill-active" id="pkg-detail-type-pill">Javascript</span>
+            <span class="hooma-badge-pill pill-active" id="pkg-detail-type-pill"><span class="dashicons dashicons-editor-code"></span> Javascript</span>
         </div>
     </div>
     

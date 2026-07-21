@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hooma Core
  * Description: Container de serviços para módulos de negócios personalizados da Hooma.
- * Version: 1.1.260717
+ * Version: 1.1.260721
  * Author: Hooma
  * Text Domain: hooma
  * Domain Path: /languages
