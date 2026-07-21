@@ -285,6 +285,19 @@ class Package
         return array();
     }
 
+    /**
+     * Obtiene las pestañas de demostración del paquete.
+     *
+     * @return array
+     */
+    public function get_demos(): array
+    {
+        if (function_exists('hooma_scan_demo_directories')) {
+            return hooma_scan_demo_directories($this->path, $this->url);
+        }
+        return array();
+    }
+
 
     /**
      * Obtiene los servicios compatibles declarados.

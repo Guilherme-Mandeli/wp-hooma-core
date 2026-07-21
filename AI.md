@@ -64,7 +64,10 @@ Si tienes que programar o modificar una funcionalidad, utiliza esta tabla para e
 - **Buenas prácticas de diseño en módulos** &rarr; [docs/modules/best-practices.md](docs/modules/best-practices.md)
 - **Antipatrones críticos a evitar** &rarr; [docs/modules/anti-patterns.md](docs/modules/anti-patterns.md)
 
-### 🖥️ Interfaz de Usuario y WordPress Admin
+### 🖥️ Interfaz de Usuario, Documentación y Demos
+- **Descubrimiento de Documentación (`docs`, `manual`, `guide`, `wiki`, etc.)** &rarr; [docs/modules/development-guide.md](docs/modules/development-guide.md#7-documentación-y-demos-en-módulos) y [docs/packages/packages-system.md](docs/packages/packages-system.md#9-documentación-y-demostraciones-en-packages)
+- **Demos y Playgrounds interactivos (`demo`, `playground`, `preview`, etc. con `index.html`)** &rarr; [docs/modules/development-guide.md](docs/modules/development-guide.md#b-pestañas-de-demostración-y-playground-demo-playground-etc)
+- **Normalizador de Slugs a Títulos (`hooma_format_slug_title`)** &rarr; Convierte nombres slugificados a frases legibles en PHP/JS conservando prefijos numéricos y acrónimos técnicos (`API`, `AI`, `UI`, `WordPress`, `GA4`, `WP`, `JS`, `TS`, `PHP`, etc.).
 - **Crear una página o menú en el WP Admin** &rarr; [docs/cookbook/admin-page.md](docs/cookbook/admin-page.md) y [docs/tutorials/03-admin-page.md](docs/tutorials/03-admin-page.md)
 - **Uso de la UI Kit unificada (`Hooma_UI`)** &rarr; [docs/concepts/ui-kit.md](docs/concepts/ui-kit.md)
 - **Gestión de Assets (CSS/JS)** &rarr; [docs/tutorials/05-assets.md](docs/tutorials/05-assets.md) y [docs/api/assets.md](docs/api/assets.md)

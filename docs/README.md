@@ -14,13 +14,13 @@ Nuestra documentación está organizada según tu perfil y objetivo de desarroll
 *Si tu objetivo es crear funcionalidades de negocio (ej. reservas, facturación, pasarelas de pago) sin modificar el núcleo de Hooma.*
 
 1.  **[Conceptos Básicos](concepts/framework.md)**: Entiende la filosofía del Thin Core y las responsabilidades del sistema.
-2.  **[Guía del Desarrollador](modules/development-guide.md)**: Aprende la estructura de carpetas, metadatos y cómo escribir tu primer módulo.
+2.  **[Guía del Desarrollador](modules/development-guide.md)**: Aprende la estructura de carpetas, metadatos, cómo incluir **documentación (`docs/`, `manual/`)** y **demos interactivas (`demo/`, `playground/`)**, y cómo escribir tu primer módulo.
 3.  **[Buenas Prácticas](modules/best-practices.md)** y **[Anti-Patrones](modules/anti-patterns.md)**: Reglas de oro para escribir código limpio, seguro y modular.
 4.  **[Serie de Tutoriales Progresivos](tutorials/01-installation.md)**: Una serie paso a paso para dominar Hooma Core.
 5.  **[Cookbook (Recetario)](cookbook/custom-database-table.md)**: Soluciones prácticas y directas a problemas habituales del día a día.
 6.  **[API Reference (Servicios)](api/settings.md)**: Consulta rápida de las firmas y parámetros de todos los métodos disponibles.
 7.  **[Módulos de Ejemplo](examples/)**: Código fuente real y listo para clonar.
-8.  **[Sistema de Packages](packages/packages-system.md)**: Aprende cómo consumir dependencias y recursos de infraestructura (como Vue, Alpine o Stripe SDK) desde tus módulos de negocio de forma desacoplada.
+8.  **[Sistema de Packages](packages/packages-system.md)**: Aprende cómo consumir dependencias y recursos de infraestructura (como Vue, Alpine o Stripe SDK) desde tus módulos de negocio de forma desacoplada, incluyendo la adición de pestañas de documentación y demostraciones.
 
 ### Desarrollo del Núcleo (Core Developer)
 *Si estás contribuyendo al framework, extendiendo sus capacidades base o quieres entender cómo funciona por debajo.*

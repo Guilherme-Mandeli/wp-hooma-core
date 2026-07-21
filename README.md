@@ -19,10 +19,12 @@ Resuelve tres problemas especificos:
 ## Características principales
 
 * Contenedor de servicios con carga diferida (lazy load).
-* Autocargador PSR-4 nativo para el nucleo y modulos.
-* Sistema de descubrimiento y ciclo de vida de modulos fuera de la carpeta de plugins tradicional.
+* Autocargador PSR-4 nativo para el núcleo y módulos.
+* Sistema de descubrimiento y ciclo de vida de módulos fuera de la carpeta de plugins tradicional.
 * Sistema de Packages para centralizar recursos comunes de infraestructura (Vue, Alpine, Stripe SDK, etc.) de forma inmutable y desacoplada.
-* Abstraccion de APIs criticas de WordPress (base de datos, cache, peticiones HTTP, cron y eventos).
+* **Descubrimiento automático de Documentación y Demos**: Escaneo dinámico de múltiples carpetas de documentación (`docs`, `documentation`, `documents`, `manual`, `guide`, `guides`, `wiki`, `help`) y pestañas de demostración (`demo`, `demos`, `example`, `examples`, `sample`, `samples`, `playground`, `preview`, `showcase`) con ejecución en `iframe`.
+* **Normalizador de Slugs a Títulos (Slug Title Normalization)**: Conversión conservadora de nombres de archivo y slugs a frases legibles en la interfaz, conservando prefijos numéricos de orden y acrónimos técnicos (`API`, `AI`, `UI`, `UX`, `WordPress`, `GA4`, `WP`, `JS`, `TS`, `PHP`, `HTML`, `CSS`, etc.).
+* Abstracción de APIs críticas de WordPress (base de datos, caché, peticiones HTTP, cron y eventos).
 
 ## Estructura del proyecto
 

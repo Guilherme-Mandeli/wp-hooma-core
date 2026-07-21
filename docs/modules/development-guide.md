@@ -162,3 +162,24 @@ if (!defined('ABSPATH')) {
     <?php echo Hooma_UI::footer('Soporte Técnico: soporte@empresa.com'); ?>
 </div>
 ```
+
+---
+
+## 7. Documentación y Demos en Módulos
+
+Hooma Core descubre automáticamente la documentación y las demostraciones interactivas presentes en la raíz de cualquier módulo, creando pestañas dedicadas en la vista de detalle del panel administrativo (**Dashboard**).
+
+### A. Pestañas de Documentación (`docs`, `manual`, `guide`, etc.)
+Si el módulo contiene carpetas de documentación directamente en su raíz:
+- **Nombres admitidos**: `docs`, `documentation`, `documents`, `manual`, `guide`, `guides`, `wiki`, `help` (sin distinción de mayúsculas/minúsculas).
+- **Múltiples pestañas**: Si un módulo incluye tanto `docs/` como `manual/`, se creará una pestaña separada para cada una de ellas (**Docs**, **Manual**).
+- **Organización de archivos**:
+  - Los archivos Markdown (`.md`) directamente en la raíz de la carpeta de documentación se agruparán bajo la sección `General`.
+  - Las subcarpetas directas (ej. `docs/arquitectura/`) se convertirán en grupos expandibles. Las sub-subcarpetas internas se ignoran.
+- **Normalización de Nombres**: Los nombres de archivo como `01-package-architecture.md` se transforman automáticamente a frases legibles (`01 Package Architecture`), manteniendo prefijos numéricos y acrónimos como `API`, `AI`, `UI`, `WordPress`, etc.
+
+### B. Pestañas de Demostración y Playground (`demo`, `playground`, etc.)
+Si el módulo dispone de carpetas de demostración o ejemplos interactivos directamente en su raíz:
+- **Nombres admitidos**: `demo`, `demos`, `example`, `examples`, `sample`, `samples`, `playground`, `preview`, `showcase`.
+- **Requisito indispensable**: La carpeta debe contener obligatoriamente el archivo `index.html` en su raíz (ej. `playground/index.html`).
+- **Comportamiento**: Al hacer clic en la pestaña (ej. **Playground** o **Demo**), Hooma Core carga y sirve el archivo `index.html` dentro de un `iframe` limpio de forma nativa sin alterar su contenido.

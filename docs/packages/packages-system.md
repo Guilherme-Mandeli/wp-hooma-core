@@ -335,3 +335,17 @@ Para asegurar la máxima estabilidad en ejecución paralela o hilos complejos de
 - **Immutability total**: Las clases `Package` y `PackageManifest` no implementan ningún método mutador (`set`). Son de solo lectura tras su inicialización en el arranque del core.
 - **Validación Temprana**: Si el manifiesto JSON de un paquete tiene errores tipográficos, carece de versión o declara un punto de entrada a un archivo inexistente en disco, Hooma Core escribe un mensaje descriptivo en el registro de errores (`error_log`) y **omite el registro de dicho paquete** sin tumbar la ejecución de la web.
 - **Preparado para múltiples versiones**: Cada paquete cuenta con una propiedad interna `$uuid`. En futuras versiones de Hooma Core, esto permitirá soportar múltiples versiones coexistentes del mismo paquete (ej. `vue` v2.x y `vue` v3.x en la misma web) sin romper la API de búsqueda y resolución.
+
+---
+
+## 9. Documentación y Demostraciones en Packages
+
+Al igual que en los módulos, Hooma Core escaneará automáticamente el directorio de cualquier paquete en busca de carpetas de documentación y demostraciones para generar pestañas dinámicas en el panel de detalles del paquete.
+
+### Pestañas de Documentación
+Cualquier carpeta nombrada `docs`, `documentation`, `documents`, `manual`, `guide`, `guides`, `wiki` o `help` en la raíz del paquete será escaneada automáticamente.
+- Los archivos `.md` en subcarpetas directas se organizan en grupos expandibles.
+- Los títulos se formatean mediante el normalizador de slugs (ej. `01-setup.md` $\rightarrow$ `01 Setup`).
+
+### Pestañas de Demostración y Sandbox
+Carpetas nombradas `demo`, `demos`, `example`, `examples`, `sample`, `samples`, `playground`, `preview` o `showcase` que contengan un archivo `index.html` en su raíz se mostrarán como pestañas interactivas cargadas en un `iframe`.

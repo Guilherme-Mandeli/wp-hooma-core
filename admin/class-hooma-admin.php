@@ -423,7 +423,7 @@ class Hooma_Admin
 
         if (!function_exists('hooma_scan_docs_directory')) {
             /**
-             * Escanea la documentación de un módulo o paquete.
+             * Escanea las carpetas de documentación de un módulo o paquete.
              * Palabras clave soportadas: docs, documentation, documents, manual, guide, guides, wiki, help.
              *
              * @param string $path Ruta absoluta del módulo o paquete.
@@ -431,88 +431,161 @@ class Hooma_Admin
              */
             function hooma_scan_docs_directory(string $path): array
             {
-                if (!is_dir($path)) {
+                if (empty($path) || !is_dir($path)) {
                     return array();
                 }
 
                 $valid_keywords = array('docs', 'documentation', 'documents', 'manual', 'guide', 'guides', 'wiki', 'help');
-                $docs_dir = null;
 
-                $items = scandir($path);
-                if ($items === false) {
-                    return array();
-                }
-
-                foreach ($items as $item) {
-                    if ($item === '.' || $item === '..') {
-                        continue;
-                    }
-                    $item_path = $path . '/' . $item;
-                    if (is_dir($item_path) && in_array(strtolower($item), $valid_keywords, true)) {
-                        $docs_dir = $item_path;
-                        break;
-                    }
-                }
-
-                if (!$docs_dir) {
-                    return array();
-                }
-
-                $dir_items = scandir($docs_dir);
+                $dir_items = scandir($path);
                 if ($dir_items === false) {
                     return array();
                 }
 
-                $grouped_docs = array();
-                $root_files = array();
-
+                $found_folders = array();
                 foreach ($dir_items as $item) {
                     if ($item === '.' || $item === '..') {
                         continue;
                     }
-
-                    $item_path = $docs_dir . '/' . $item;
-
+                    $item_path = $path . '/' . $item;
                     if (is_dir($item_path)) {
-                        $group_name = $item;
-                        $group_items = scandir($item_path);
-                        if ($group_items === false) {
-                            continue;
-                        }
-
-                        $group_files = array();
-                        foreach ($group_items as $g_item) {
-                            if ($g_item === '.' || $g_item === '..') {
-                                continue;
-                            }
-
-                            $g_path = $item_path . '/' . $g_item;
-
-                            // IMPORTANTE: No se leerá subcarpetas! Si hay una carpeta dentro de carpeta 1 o carpeta 2 se ignorará
-                            if (is_file($g_path) && strtolower(pathinfo($g_item, PATHINFO_EXTENSION)) === 'md') {
-                                $content = file_get_contents($g_path);
-                                if ($content !== false) {
-                                    $group_files[$g_item] = $content;
-                                }
-                            }
-                        }
-
-                        if (!empty($group_files)) {
-                            $grouped_docs[$group_name] = $group_files;
-                        }
-                    } elseif (is_file($item_path) && strtolower(pathinfo($item, PATHINFO_EXTENSION)) === 'md') {
-                        $content = file_get_contents($item_path);
-                        if ($content !== false) {
-                            $root_files[$item] = $content;
+                        $lower = strtolower($item);
+                        if (!isset($found_folders[$lower])) {
+                            $found_folders[$lower] = $item;
                         }
                     }
                 }
 
-                if (!empty($root_files)) {
-                    $grouped_docs['General'] = $root_files;
+                $doc_tabs = array();
+                foreach ($valid_keywords as $keyword) {
+                    if (isset($found_folders[$keyword])) {
+                        $folder_name = $found_folders[$keyword];
+                        $docs_dir = $path . '/' . $folder_name;
+
+                        $dir_items_sub = scandir($docs_dir);
+                        if ($dir_items_sub === false) {
+                            continue;
+                        }
+
+                        $grouped_docs = array();
+                        $root_files = array();
+
+                        foreach ($dir_items_sub as $item) {
+                            if ($item === '.' || $item === '..') {
+                                continue;
+                            }
+
+                            $item_path = $docs_dir . '/' . $item;
+
+                            if (is_dir($item_path)) {
+                                $group_name = $item;
+                                $group_items = scandir($item_path);
+                                if ($group_items === false) {
+                                    continue;
+                                }
+
+                                $group_files = array();
+                                foreach ($group_items as $g_item) {
+                                    if ($g_item === '.' || $g_item === '..') {
+                                        continue;
+                                    }
+
+                                    $g_path = $item_path . '/' . $g_item;
+
+                                    // IMPORTANTE: No se leerá subcarpetas! Si hay una carpeta dentro de carpeta 1 o carpeta 2 se ignorará
+                                    if (is_file($g_path) && strtolower(pathinfo($g_item, PATHINFO_EXTENSION)) === 'md') {
+                                        $content = file_get_contents($g_path);
+                                        if ($content !== false) {
+                                            $group_files[$g_item] = $content;
+                                        }
+                                    }
+                                }
+
+                                if (!empty($group_files)) {
+                                    $grouped_docs[$group_name] = $group_files;
+                                }
+                            } elseif (is_file($item_path) && strtolower(pathinfo($item, PATHINFO_EXTENSION)) === 'md') {
+                                $content = file_get_contents($item_path);
+                                if ($content !== false) {
+                                    $root_files[$item] = $content;
+                                }
+                            }
+                        }
+
+                        if (!empty($root_files)) {
+                            $grouped_docs['General'] = $root_files;
+                        }
+
+                        if (!empty($grouped_docs)) {
+                            $doc_tabs[] = array(
+                                'id'     => sanitize_title($folder_name),
+                                'folder' => $folder_name,
+                                'title'  => hooma_format_slug_title($folder_name),
+                                'docs'   => $grouped_docs,
+                            );
+                        }
+                    }
                 }
 
-                return $grouped_docs;
+                return $doc_tabs;
+            }
+        }
+
+        if (!function_exists('hooma_scan_demo_directories')) {
+            /**
+             * Escanea carpetas de demostración/ejemplo en la raíz del módulo o paquete.
+             * Palabras clave soportadas: demo, demos, example, examples, sample, samples, playground, preview, showcase.
+             * Condición: Debe existir exactamente el archivo index.html en la raíz de esa carpeta.
+             *
+             * @param string      $path Ruta absoluta del módulo o paquete.
+             * @param string|null $url  URL pública base del módulo o paquete.
+             * @return array
+             */
+            function hooma_scan_demo_directories(string $path, ?string $url): array
+            {
+                if (empty($path) || !is_dir($path) || empty($url)) {
+                    return array();
+                }
+
+                $valid_keywords = array('demo', 'demos', 'example', 'examples', 'sample', 'samples', 'playground', 'preview', 'showcase');
+
+                $dir_items = scandir($path);
+                if ($dir_items === false) {
+                    return array();
+                }
+
+                $found_folders = array();
+                foreach ($dir_items as $item) {
+                    if ($item === '.' || $item === '..') {
+                        continue;
+                    }
+                    $item_path = $path . '/' . $item;
+                    if (is_dir($item_path)) {
+                        $lower = strtolower($item);
+                        if (!isset($found_folders[$lower])) {
+                            $found_folders[$lower] = $item;
+                        }
+                    }
+                }
+
+                $demos = array();
+                foreach ($valid_keywords as $keyword) {
+                    if (isset($found_folders[$keyword])) {
+                        $folder_name = $found_folders[$keyword];
+                        $index_file = $path . '/' . $folder_name . '/index.html';
+
+                        if (is_file($index_file)) {
+                            $demos[] = array(
+                                'id'     => sanitize_title($folder_name),
+                                'folder' => $folder_name,
+                                'title'  => hooma_format_slug_title($folder_name),
+                                'url'    => esc_url(trailingslashit($url) . $folder_name . '/index.html'),
+                            );
+                        }
+                    }
+                }
+
+                return $demos;
             }
         }
         // Use Hooma_UI for structure
@@ -560,6 +633,7 @@ class Hooma_Admin
                 'menu_title' => $menu_title,
                 'readme' => $readme_content,
                 'docs' => hooma_scan_docs_directory($module_path),
+                'demos' => hooma_scan_demo_directories($module_path, Hooma::modules()->get_module_url($id)),
                 'activate_url' => admin_url('admin.php?page=hooma-modules&hooma_action=activate&action=' . ($is_active ? 'deactivate' : 'activate') . '&module=' . $id . '&_wpnonce=' . $activate_nonce),
                 'delete_url' => admin_url('admin.php?page=hooma-modules&action=delete_module&module=' . $id . '&_wpnonce=' . $delete_nonce),
                 'open_url' => $is_active && $menu_title ? admin_url('admin.php?page=' . $id) : ''
@@ -596,6 +670,7 @@ class Hooma_Admin
                 'readme' => $package->get_readme(),
                 'examples' => $examples_data,
                 'docs' => $package->get_docs(),
+                'demos' => $package->get_demos(),
                 'delete_url' => admin_url('admin.php?page=hooma-modules&tab=packages&action=delete_package&package=' . $name . '&_wpnonce=' . $delete_nonce)
             );
         }
@@ -1084,40 +1159,127 @@ class Hooma_Admin
                     }
                 }
 
-                // Module Documentation Tab
+                // Module Documentation Tabs (Dynamic)
                 var modDocsTabBtn = document.getElementById('btn-mod-tab-docs');
-                var modDocsList = document.getElementById('mod-docs-list');
-                var modDocsHeader = document.getElementById('mod-docs-header');
-                var modDocsBody = document.getElementById('mod-docs-body');
-                if (modDocsHeader) modDocsHeader.innerHTML = '<span class="description"><?php echo esc_js(__('Select a document to view its content', 'hooma')); ?></span>';
-                if (modDocsBody) modDocsBody.innerHTML = '';
+                if (modDocsTabBtn) modDocsTabBtn.style.display = 'none';
 
-                if (mod.docs && Object.keys(mod.docs).length > 0) {
-                    if (modDocsList) {
-                        modDocsList.innerHTML = '';
-                        for (var groupName in mod.docs) {
-                            var groupFiles = mod.docs[groupName];
+                document.querySelectorAll('#view-module-details .hooma-dynamic-doc-tab').forEach(function(el) { el.remove(); });
+                document.querySelectorAll('#view-module-details .hooma-dynamic-doc-pane').forEach(function(el) { el.remove(); });
+
+                if (mod.docs && mod.docs.length > 0) {
+                    var modNav = document.querySelector('#view-module-details .hooma-detail-tabs-nav');
+                    var modMain = document.querySelector('#view-module-details .hooma-detail-main');
+
+                    mod.docs.forEach(function(docTab) {
+                        var btn = document.createElement('button');
+                        btn.className = 'hooma-detail-tab-btn hooma-dynamic-doc-tab';
+                        btn.id = 'btn-mod-tab-doc-' + docTab.id;
+                        btn.onclick = function(event) {
+                            hoomaSwitchModTab(event, 'doc-' + docTab.id);
+                        };
+                        btn.textContent = docTab.title;
+                        if (modNav) modNav.appendChild(btn);
+
+                        var pane = document.createElement('div');
+                        pane.className = 'hooma-detail-tab-pane hooma-dynamic-doc-pane';
+                        pane.id = 'mod-pane-doc-' + docTab.id;
+                        pane.style.padding = '0';
+
+                        var explorer = document.createElement('div');
+                        explorer.className = 'hooma-examples-explorer';
+                        explorer.style.border = 'none';
+                        explorer.style.minHeight = '400px';
+                        explorer.style.borderRadius = '0';
+
+                        var listPanel = document.createElement('div');
+                        listPanel.className = 'hooma-examples-list-panel';
+                        listPanel.id = 'mod-doc-list-' + docTab.id;
+                        listPanel.style.borderRight = '1px solid #e0e0e0';
+
+                        for (var groupName in docTab.docs) {
+                            var groupFiles = docTab.docs[groupName];
                             if (!groupFiles || Object.keys(groupFiles).length === 0) continue;
 
                             var docGroup = document.createElement('div');
                             docGroup.className = 'hooma-example-group';
                             docGroup.innerHTML = '<h4 class="hooma-example-group-title" onclick="hoomaToggleDocGroup(this)"><span class="dashicons dashicons-arrow-right"></span> ' + hoomaFormatSlugTitle(groupName) + '</h4>';
-                            
+
                             var ulDocs = document.createElement('ul');
                             ulDocs.className = 'hooma-example-files-list';
 
                             for (var docFilename in groupFiles) {
                                 var liDoc = document.createElement('li');
-                                liDoc.innerHTML = '<a href="#" class="hooma-doc-file-link" onclick="hoomaSelectModDocFile(event, \'' + id + '\', \'' + groupName.replace(/'/g, "\\'") + '\', \'' + docFilename.replace(/'/g, "\\'") + '\')"><span class="dashicons dashicons-media-text"></span> ' + hoomaFormatSlugTitle(docFilename) + '</a>';
+                                liDoc.innerHTML = '<a href="#" class="hooma-doc-file-link" onclick="hoomaSelectModDocFileTab(event, \'' + id + '\', \'' + docTab.id + '\', \'' + groupName.replace(/'/g, "\\'") + '\', \'' + docFilename.replace(/'/g, "\\'") + '\')"><span class="dashicons dashicons-media-text"></span> ' + hoomaFormatSlugTitle(docFilename) + '</a>';
                                 ulDocs.appendChild(liDoc);
                             }
                             docGroup.appendChild(ulDocs);
-                            modDocsList.appendChild(docGroup);
+                            listPanel.appendChild(docGroup);
                         }
-                    }
-                    if (modDocsTabBtn) modDocsTabBtn.style.display = 'block';
-                } else {
-                    if (modDocsTabBtn) modDocsTabBtn.style.display = 'none';
+
+                        var viewerPanel = document.createElement('div');
+                        viewerPanel.className = 'hooma-code-viewer-panel';
+                        viewerPanel.style.background = '#fff';
+
+                        var header = document.createElement('div');
+                        header.className = 'hooma-code-viewer-header';
+                        header.id = 'mod-doc-header-' + docTab.id;
+                        header.style.background = '#f6f7f7';
+                        header.innerHTML = '<span class="description"><?php echo esc_js(__('Select a document to view its content', 'hooma')); ?></span>';
+
+                        var body = document.createElement('div');
+                        body.className = 'hooma-markdown-body';
+                        body.id = 'mod-doc-body-' + docTab.id;
+                        body.style.padding = '20px';
+                        body.style.overflowY = 'auto';
+                        body.style.flexGrow = '1';
+                        body.style.boxSizing = 'border-box';
+
+                        viewerPanel.appendChild(header);
+                        viewerPanel.appendChild(body);
+
+                        explorer.appendChild(listPanel);
+                        explorer.appendChild(viewerPanel);
+
+                        pane.appendChild(explorer);
+                        if (modMain) modMain.appendChild(pane);
+                    });
+                }
+
+                // Clean up previous dynamic demo tabs and panes for module
+                document.querySelectorAll('#view-module-details .hooma-dynamic-demo-tab').forEach(function(el) { el.remove(); });
+                document.querySelectorAll('#view-module-details .hooma-dynamic-demo-pane').forEach(function(el) { el.remove(); });
+
+                // Render dynamic demo tabs if present
+                if (mod.demos && mod.demos.length > 0) {
+                    var modNav = document.querySelector('#view-module-details .hooma-detail-tabs-nav');
+                    var modMain = document.querySelector('#view-module-details .hooma-detail-main');
+
+                    mod.demos.forEach(function(demo) {
+                        var btn = document.createElement('button');
+                        btn.className = 'hooma-detail-tab-btn hooma-dynamic-demo-tab';
+                        btn.id = 'btn-mod-tab-demo-' + demo.id;
+                        btn.onclick = function(event) {
+                            hoomaSwitchModTab(event, 'demo-' + demo.id);
+                        };
+                        btn.textContent = demo.title;
+                        if (modNav) modNav.appendChild(btn);
+
+                        var pane = document.createElement('div');
+                        pane.className = 'hooma-detail-tab-pane hooma-dynamic-demo-pane';
+                        pane.id = 'mod-pane-demo-' + demo.id;
+                        pane.style.padding = '0';
+
+                        var iframe = document.createElement('iframe');
+                        iframe.src = demo.url;
+                        iframe.style.width = '100%';
+                        iframe.style.height = '600px';
+                        iframe.style.minHeight = '500px';
+                        iframe.style.border = 'none';
+                        iframe.style.display = 'block';
+
+                        pane.appendChild(iframe);
+                        if (modMain) modMain.appendChild(pane);
+                    });
                 }
 
                 // Reset tabs state for module detail
@@ -1263,38 +1425,127 @@ class Hooma_Admin
                     examplesBtn.style.display = 'none';
                 }
 
-                // Documentation Tab
+                // Package Documentation Tabs (Dynamic)
                 var docsTabBtn = document.getElementById('btn-pkg-tab-docs');
-                var docsList = document.getElementById('pkg-docs-list');
-                var docsHeader = document.getElementById('pkg-docs-header');
-                var docsBody = document.getElementById('pkg-docs-body');
-                docsBody.innerHTML = '';
-                docsHeader.innerHTML = '<span class="description"><?php echo esc_js(__('Select a document to view its content', 'hooma')); ?></span>';
+                if (docsTabBtn) docsTabBtn.style.display = 'none';
 
-                if (pkg.docs && Object.keys(pkg.docs).length > 0) {
-                    docsList.innerHTML = '';
-                    for (var groupName in pkg.docs) {
-                        var groupFiles = pkg.docs[groupName];
-                        if (!groupFiles || Object.keys(groupFiles).length === 0) continue;
+                document.querySelectorAll('#view-package-details .hooma-dynamic-doc-tab').forEach(function(el) { el.remove(); });
+                document.querySelectorAll('#view-package-details .hooma-dynamic-doc-pane').forEach(function(el) { el.remove(); });
 
-                        var docGroup = document.createElement('div');
-                        docGroup.className = 'hooma-example-group';
-                        docGroup.innerHTML = '<h4 class="hooma-example-group-title" onclick="hoomaToggleDocGroup(this)"><span class="dashicons dashicons-arrow-right"></span> ' + hoomaFormatSlugTitle(groupName) + '</h4>';
-                        
-                        var ulDocs = document.createElement('ul');
-                        ulDocs.className = 'hooma-example-files-list';
+                if (pkg.docs && pkg.docs.length > 0) {
+                    var pkgNav = document.querySelector('#view-package-details .hooma-detail-tabs-nav');
+                    var pkgMain = document.querySelector('#view-package-details .hooma-detail-main');
 
-                        for (var docFilename in groupFiles) {
-                            var liDoc = document.createElement('li');
-                            liDoc.innerHTML = '<a href="#" class="hooma-doc-file-link" onclick="hoomaSelectPkgDocFile(event, \'' + name + '\', \'' + groupName.replace(/'/g, "\\'") + '\', \'' + docFilename.replace(/'/g, "\\'") + '\')"><span class="dashicons dashicons-media-text"></span> ' + hoomaFormatSlugTitle(docFilename) + '</a>';
-                            ulDocs.appendChild(liDoc);
+                    pkg.docs.forEach(function(docTab) {
+                        var btn = document.createElement('button');
+                        btn.className = 'hooma-detail-tab-btn hooma-dynamic-doc-tab';
+                        btn.id = 'btn-pkg-tab-doc-' + docTab.id;
+                        btn.onclick = function(event) {
+                            hoomaSwitchPkgTab(event, 'doc-' + docTab.id);
+                        };
+                        btn.textContent = docTab.title;
+                        if (pkgNav) pkgNav.appendChild(btn);
+
+                        var pane = document.createElement('div');
+                        pane.className = 'hooma-detail-tab-pane hooma-dynamic-doc-pane';
+                        pane.id = 'pkg-pane-doc-' + docTab.id;
+                        pane.style.padding = '0';
+
+                        var explorer = document.createElement('div');
+                        explorer.className = 'hooma-examples-explorer';
+                        explorer.style.border = 'none';
+                        explorer.style.minHeight = '400px';
+                        explorer.style.borderRadius = '0';
+
+                        var listPanel = document.createElement('div');
+                        listPanel.className = 'hooma-examples-list-panel';
+                        listPanel.id = 'pkg-doc-list-' + docTab.id;
+                        listPanel.style.borderRight = '1px solid #e0e0e0';
+
+                        for (var groupName in docTab.docs) {
+                            var groupFiles = docTab.docs[groupName];
+                            if (!groupFiles || Object.keys(groupFiles).length === 0) continue;
+
+                            var docGroup = document.createElement('div');
+                            docGroup.className = 'hooma-example-group';
+                            docGroup.innerHTML = '<h4 class="hooma-example-group-title" onclick="hoomaToggleDocGroup(this)"><span class="dashicons dashicons-arrow-right"></span> ' + hoomaFormatSlugTitle(groupName) + '</h4>';
+
+                            var ulDocs = document.createElement('ul');
+                            ulDocs.className = 'hooma-example-files-list';
+
+                            for (var docFilename in groupFiles) {
+                                var liDoc = document.createElement('li');
+                                liDoc.innerHTML = '<a href="#" class="hooma-doc-file-link" onclick="hoomaSelectPkgDocFileTab(event, \'' + name + '\', \'' + docTab.id + '\', \'' + groupName.replace(/'/g, "\\'") + '\', \'' + docFilename.replace(/'/g, "\\'") + '\')"><span class="dashicons dashicons-media-text"></span> ' + hoomaFormatSlugTitle(docFilename) + '</a>';
+                                ulDocs.appendChild(liDoc);
+                            }
+                            docGroup.appendChild(ulDocs);
+                            listPanel.appendChild(docGroup);
                         }
-                        docGroup.appendChild(ulDocs);
-                        docsList.appendChild(docGroup);
-                    }
-                    docsTabBtn.style.display = 'block';
-                } else {
-                    docsTabBtn.style.display = 'none';
+
+                        var viewerPanel = document.createElement('div');
+                        viewerPanel.className = 'hooma-code-viewer-panel';
+                        viewerPanel.style.background = '#fff';
+
+                        var header = document.createElement('div');
+                        header.className = 'hooma-code-viewer-header';
+                        header.id = 'pkg-doc-header-' + docTab.id;
+                        header.style.background = '#f6f7f7';
+                        header.innerHTML = '<span class="description"><?php echo esc_js(__('Select a document to view its content', 'hooma')); ?></span>';
+
+                        var body = document.createElement('div');
+                        body.className = 'hooma-markdown-body';
+                        body.id = 'pkg-doc-body-' + docTab.id;
+                        body.style.padding = '20px';
+                        body.style.overflowY = 'auto';
+                        body.style.flexGrow = '1';
+                        body.style.boxSizing = 'border-box';
+
+                        viewerPanel.appendChild(header);
+                        viewerPanel.appendChild(body);
+
+                        explorer.appendChild(listPanel);
+                        explorer.appendChild(viewerPanel);
+
+                        pane.appendChild(explorer);
+                        if (pkgMain) pkgMain.appendChild(pane);
+                    });
+                }
+
+                // Clean up previous dynamic demo tabs and panes for package
+                document.querySelectorAll('#view-package-details .hooma-dynamic-demo-tab').forEach(function(el) { el.remove(); });
+                document.querySelectorAll('#view-package-details .hooma-dynamic-demo-pane').forEach(function(el) { el.remove(); });
+
+                // Render dynamic demo tabs if present
+                if (pkg.demos && pkg.demos.length > 0) {
+                    var pkgNav = document.querySelector('#view-package-details .hooma-detail-tabs-nav');
+                    var pkgMain = document.querySelector('#view-package-details .hooma-detail-main');
+
+                    pkg.demos.forEach(function(demo) {
+                        var btn = document.createElement('button');
+                        btn.className = 'hooma-detail-tab-btn hooma-dynamic-demo-tab';
+                        btn.id = 'btn-pkg-tab-demo-' + demo.id;
+                        btn.onclick = function(event) {
+                            hoomaSwitchPkgTab(event, 'demo-' + demo.id);
+                        };
+                        btn.textContent = demo.title;
+                        if (pkgNav) pkgNav.appendChild(btn);
+
+                        var pane = document.createElement('div');
+                        pane.className = 'hooma-detail-tab-pane hooma-dynamic-demo-pane';
+                        pane.id = 'pkg-pane-demo-' + demo.id;
+                        pane.style.padding = '0';
+
+                        var iframe = document.createElement('iframe');
+                        iframe.src = demo.url;
+                        iframe.style.width = '100%';
+                        iframe.style.height = '600px';
+                        iframe.style.minHeight = '500px';
+                        iframe.style.border = 'none';
+                        iframe.style.display = 'block';
+
+                        pane.appendChild(iframe);
+                        if (pkgMain) pkgMain.appendChild(pane);
+                    });
                 }
 
                 // Default active tab in detail
@@ -1444,9 +1695,9 @@ class Hooma_Admin
                 docsBody.innerHTML = window.marked ? marked.parse(content) : content;
             }
 
-            function hoomaSelectModDocFile(e, modId, groupName, docFilename) {
+            function hoomaSelectModDocFileTab(e, modId, docTabId, groupName, docFilename) {
                 if (e) e.preventDefault();
-                document.querySelectorAll('#mod-pane-docs .hooma-doc-file-link').forEach(function(el) {
+                document.querySelectorAll('#mod-pane-doc-' + docTabId + ' .hooma-doc-file-link').forEach(function(el) {
                     el.classList.remove('active');
                 });
                 if (e && e.currentTarget) {
@@ -1454,12 +1705,54 @@ class Hooma_Admin
                 }
 
                 var mod = hoomaEcosystem.modules[modId];
-                if (!mod || !mod.docs || !mod.docs[groupName] || !mod.docs[groupName][docFilename]) return;
+                if (!mod || !mod.docs) return;
 
-                var content = mod.docs[groupName][docFilename];
-                document.getElementById('mod-docs-header').innerHTML = '<strong>' + hoomaFormatSlugTitle(groupName) + ' / ' + hoomaFormatSlugTitle(docFilename) + '</strong>';
-                var docsBody = document.getElementById('mod-docs-body');
-                docsBody.innerHTML = window.marked ? marked.parse(content) : content;
+                var targetDocTab = null;
+                for (var i = 0; i < mod.docs.length; i++) {
+                    if (mod.docs[i].id === docTabId) {
+                        targetDocTab = mod.docs[i];
+                        break;
+                    }
+                }
+
+                if (!targetDocTab || !targetDocTab.docs || !targetDocTab.docs[groupName] || !targetDocTab.docs[groupName][docFilename]) return;
+
+                var content = targetDocTab.docs[groupName][docFilename];
+                var headerEl = document.getElementById('mod-doc-header-' + docTabId);
+                var bodyEl = document.getElementById('mod-doc-body-' + docTabId);
+
+                if (headerEl) headerEl.innerHTML = '<strong>' + hoomaFormatSlugTitle(groupName) + ' / ' + hoomaFormatSlugTitle(docFilename) + '</strong>';
+                if (bodyEl) bodyEl.innerHTML = window.marked ? marked.parse(content) : content;
+            }
+
+            function hoomaSelectPkgDocFileTab(e, pkgName, docTabId, groupName, docFilename) {
+                if (e) e.preventDefault();
+                document.querySelectorAll('#pkg-pane-doc-' + docTabId + ' .hooma-doc-file-link').forEach(function(el) {
+                    el.classList.remove('active');
+                });
+                if (e && e.currentTarget) {
+                    e.currentTarget.classList.add('active');
+                }
+
+                var pkg = hoomaEcosystem.packages[pkgName];
+                if (!pkg || !pkg.docs) return;
+
+                var targetDocTab = null;
+                for (var i = 0; i < pkg.docs.length; i++) {
+                    if (pkg.docs[i].id === docTabId) {
+                        targetDocTab = pkg.docs[i];
+                        break;
+                    }
+                }
+
+                if (!targetDocTab || !targetDocTab.docs || !targetDocTab.docs[groupName] || !targetDocTab.docs[groupName][docFilename]) return;
+
+                var content = targetDocTab.docs[groupName][docFilename];
+                var headerEl = document.getElementById('pkg-doc-header-' + docTabId);
+                var bodyEl = document.getElementById('pkg-doc-body-' + docTabId);
+
+                if (headerEl) headerEl.innerHTML = '<strong>' + hoomaFormatSlugTitle(groupName) + ' / ' + hoomaFormatSlugTitle(docFilename) + '</strong>';
+                if (bodyEl) bodyEl.innerHTML = window.marked ? marked.parse(content) : content;
             }
 
             function hoomaSelectDoc(e, group, filename) {
